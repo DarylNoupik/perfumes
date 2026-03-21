@@ -116,12 +116,12 @@ const SEED_PRODUCTS = [
   },
   {
     id: 4,
-    name: "Black Opium",
-    brand: "Yves Saint Laurent",
+    name: "Legend Mont Blanc",
+    brand: "Mont Blanc",
     price: 30000,
     stock: 2,
-    cat: "YSL",
-    desc: "Icône de la séduction — café noir intense, vanille addictive et fleur blanche. L'essence du glamour moderne.",
+    cat: "Mont Blanc",
+    desc: "La légende en flacon — bergamote lumineuse, lavande aromatique et bois de cèdre. L'élégance masculine à son plus haut.",
     notes: ["Café", "Vanille", "Fleur blanche"],
     size: "90 ml",
     img: "⚫",
@@ -1011,7 +1011,7 @@ function ShopPage({ onView }) {
           <a
             href={waLink(
               settings.whatsapp,
-              "Bonjour ! Je souhaite passer une commande. Pouvez-vous m'aider ?",
+              "Bonjour M. Ulrich ! Je souhaite passer une commande de parfums. Pouvez-vous m'aider ?",
             )}
             target="_blank"
             rel="noreferrer"
