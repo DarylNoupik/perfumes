@@ -59,8 +59,8 @@ const SEED_SETTINGS = {
   tagline: "Maison de Parfums",
   heroTitle: "L'Art du Parfum Rare",
   heroSubtitle:
-    "Des fragrances d'exception, sélectionnées pour les connaisseurs. Livraison partout au Cameroun.",
-  heroLabel: "Collection Exclusive · Cameroun",
+    "Des fragrances d'exception, sélectionnées pour les connaisseurs. Livraison partout au Douala.",
+  heroLabel: "Collection Exclusive ·",
   city: "Douala, Cameroun",
   whatsapp: "237656493976",
   copyright: "© 2026 DIHU · Tous droits réservés",
