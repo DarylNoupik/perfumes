@@ -3,7 +3,13 @@
 //  Architecture : Backend (store + logique) / Frontend (UI pure)
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useContext, createContext, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+  createContext,
+  useCallback,
+} from "react";
 import {
   ShoppingBag,
   Package,
@@ -24,6 +30,7 @@ import {
   Settings,
   Edit2,
   Save,
+  Menu,
 } from "lucide-react";
 
 // ── Fonts & Global CSS ───────────────────────────────────────────────────────
@@ -47,6 +54,11 @@ _gs.textContent = `
   ::-webkit-scrollbar-thumb{background:var(--gold-l);border-radius:2px}
   input,select,textarea{font-family:var(--fb)}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  .admin-tabs-scroll::-webkit-scrollbar{display:none}
+  @media(max-width:768px){
+    .admin-tabs-scroll{scrollbar-width:none}
+    table{font-size:11px}
+  }
 `;
 document.head.appendChild(_gs);
 
@@ -507,6 +519,19 @@ function StoreProvider({ children }) {
 }
 const useStore = () => useContext(Ctx);
 
+// ── Responsive helper ─────────────────────────────────────────────────────────
+function useIsMobile(bp = 768) {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < bp : false,
+  );
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < bp);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, [bp]);
+  return isMobile;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  FRONTEND — Composants UI purs
 // ═══════════════════════════════════════════════════════════════════════════
@@ -782,6 +807,7 @@ export default function App() {
 
 function Shell() {
   const { toast, session, settings, cartCount } = useStore();
+  const isMobile = useIsMobile();
   const [view, setView] = useState("shop");
   const [selProduct, setSelProduct] = useState(null);
   const nav = (v) => {
@@ -798,8 +824,10 @@ function Shell() {
         <div
           style={{
             position: "fixed",
-            top: 18,
-            right: 18,
+            top: isMobile ? "auto" : 18,
+            bottom: isMobile ? 18 : "auto",
+            right: isMobile ? 12 : 18,
+            left: isMobile ? 12 : "auto",
             zIndex: 9999,
             background: toast.type === "err" ? "#fff0ee" : "#fffdf7",
             border: `1px solid ${toast.type === "err" ? "rgba(229,57,53,.35)" : "rgba(154,110,46,.35)"}`,
@@ -809,7 +837,8 @@ function Shell() {
             fontSize: 13,
             boxShadow: "0 8px 32px rgba(42,33,24,.12)",
             animation: "fadeSlide .25s ease",
-            maxWidth: 290,
+            maxWidth: isMobile ? "100%" : 290,
+            textAlign: isMobile ? "center" : "left",
           }}
         >
           {toast.msg}
@@ -833,7 +862,18 @@ function Shell() {
 
 function AppHeader({ view, nav }) {
   const { logout, session, settings, cartCount } = useStore();
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
   const isAdmin = session?.role === "admin" || session?.role === "vendor";
+  const navLinks = [
+    { l: "Boutique", v: "shop" },
+    { l: "Mon Compte", v: "account" },
+    ...(isAdmin ? [{ l: "Dashboard", v: "admin" }] : []),
+  ];
+  const handleNav = (v) => {
+    nav(v);
+    setMenuOpen(false);
+  };
   return (
     <header
       style={{
@@ -844,116 +884,244 @@ function AppHeader({ view, nav }) {
         backdropFilter: "blur(24px)",
         borderBottom: "1px solid var(--border)",
         boxShadow: "0 1px 22px rgba(120,90,50,.06)",
-        height: 62,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 28px",
-        gap: 16,
       }}
     >
       <div
-        onClick={() => nav("shop")}
-        style={{ cursor: "pointer", lineHeight: 1 }}
-      >
-        <div
-          style={{
-            fontFamily: "var(--fd)",
-            fontSize: 21,
-            fontWeight: 600,
-            letterSpacing: "0.18em",
-            color: "var(--gold)",
-          }}
-        >
-          {settings.shopName}
-        </div>
-        <div
-          style={{
-            fontSize: 8,
-            letterSpacing: "0.35em",
-            textTransform: "uppercase",
-            color: "var(--muted)",
-            marginTop: 1,
-          }}
-        >
-          {settings.tagline}
-        </div>
-      </div>
-      <nav
         style={{
+          height: 62,
           display: "flex",
           alignItems: "center",
-          gap: 26,
-          flexWrap: "wrap",
+          justifyContent: "space-between",
+          padding: isMobile ? "0 16px" : "0 28px",
+          gap: 12,
         }}
       >
-        {[
-          { l: "Boutique", v: "shop" },
-          { l: "Mon Compte", v: "account" },
-          ...(isAdmin ? [{ l: "Dashboard", v: "admin" }] : []),
-        ].map((n) => (
-          <span
-            key={n.v}
-            onClick={() => nav(n.v)}
+        {/* Logo */}
+        <div
+          onClick={() => handleNav("shop")}
+          style={{ cursor: "pointer", lineHeight: 1, flexShrink: 0 }}
+        >
+          <div
             style={{
-              fontSize: 11,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: view === n.v ? "var(--gold)" : "var(--muted)",
-              cursor: "pointer",
-              transition: "color .15s",
+              fontFamily: "var(--fd)",
+              fontSize: isMobile ? 18 : 21,
+              fontWeight: 600,
+              letterSpacing: "0.18em",
+              color: "var(--gold)",
             }}
           >
-            {n.l}
-          </span>
-        ))}
-        {session ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 12, color: "var(--muted)" }}>
-              {session.name.split(" ")[0]}
-            </span>
-            <Btn sz="sm" v="ghost" onClick={logout}>
-              <LogOut size={13} />
-              Sortir
-            </Btn>
+            {settings.shopName}
           </div>
-        ) : (
-          <Btn sz="sm" v="outline" onClick={() => nav("account")}>
-            <LogIn size={13} />
-            Connexion
-          </Btn>
+          <div
+            style={{
+              fontSize: 8,
+              letterSpacing: "0.35em",
+              textTransform: "uppercase",
+              color: "var(--muted)",
+              marginTop: 1,
+            }}
+          >
+            {settings.tagline}
+          </div>
+        </div>
+
+        {/* Desktop nav */}
+        {!isMobile && (
+          <nav style={{ display: "flex", alignItems: "center", gap: 26 }}>
+            {navLinks.map((n) => (
+              <span
+                key={n.v}
+                onClick={() => nav(n.v)}
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: view === n.v ? "var(--gold)" : "var(--muted)",
+                  cursor: "pointer",
+                  transition: "color .15s",
+                }}
+              >
+                {n.l}
+              </span>
+            ))}
+            {session ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>
+                  {session.name.split(" ")[0]}
+                </span>
+                <Btn sz="sm" v="ghost" onClick={logout}>
+                  <LogOut size={13} />
+                  Sortir
+                </Btn>
+              </div>
+            ) : (
+              <Btn sz="sm" v="outline" onClick={() => nav("account")}>
+                <LogIn size={13} />
+                Connexion
+              </Btn>
+            )}
+            <div
+              onClick={() => nav("cart")}
+              style={{
+                cursor: "pointer",
+                position: "relative",
+                padding: "7px 13px",
+                background: "var(--surf)",
+                border: "1px solid var(--border)",
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+              }}
+            >
+              <ShoppingBag size={15} color="var(--gold)" />
+              <span style={{ fontSize: 12 }}>{cartCount}</span>
+              {cartCount > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -3,
+                    right: -3,
+                    width: 7,
+                    height: 7,
+                    background: "var(--gold)",
+                    borderRadius: "50%",
+                  }}
+                />
+              )}
+            </div>
+          </nav>
         )}
+
+        {/* Mobile : panier + hamburger */}
+        {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              onClick={() => handleNav("cart")}
+              style={{
+                cursor: "pointer",
+                position: "relative",
+                padding: "6px 11px",
+                background: "var(--surf)",
+                border: "1px solid var(--border)",
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <ShoppingBag size={15} color="var(--gold)" />
+              <span style={{ fontSize: 12 }}>{cartCount}</span>
+              {cartCount > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -3,
+                    right: -3,
+                    width: 7,
+                    height: 7,
+                    background: "var(--gold)",
+                    borderRadius: "50%",
+                  }}
+                />
+              )}
+            </div>
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              style={{
+                background: "none",
+                border: "1px solid var(--border)",
+                borderRadius: 4,
+                padding: "6px 8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                color: "var(--text)",
+              }}
+            >
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile dropdown menu */}
+      {isMobile && menuOpen && (
         <div
-          onClick={() => nav("cart")}
           style={{
-            cursor: "pointer",
-            position: "relative",
-            padding: "7px 13px",
-            background: "var(--surf)",
-            border: "1px solid var(--border)",
-            borderRadius: 4,
+            borderTop: "1px solid var(--border)",
+            background: "rgba(250,247,242,.97)",
+            padding: "12px 16px 16px",
             display: "flex",
-            alignItems: "center",
-            gap: 7,
+            flexDirection: "column",
+            gap: 4,
+            animation: "fadeSlide .2s ease",
           }}
         >
-          <ShoppingBag size={15} color="var(--gold)" />
-          <span style={{ fontSize: 12 }}>{cartCount}</span>
-          {cartCount > 0 && (
+          {navLinks.map((n) => (
             <div
+              key={n.v}
+              onClick={() => handleNav(n.v)}
               style={{
-                position: "absolute",
-                top: -3,
-                right: -3,
-                width: 7,
-                height: 7,
-                background: "var(--gold)",
-                borderRadius: "50%",
+                padding: "11px 14px",
+                borderRadius: 5,
+                fontSize: 13,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                background: view === n.v ? "var(--gold-dim)" : "transparent",
+                color: view === n.v ? "var(--gold)" : "var(--text)",
+                cursor: "pointer",
+                fontWeight: view === n.v ? 500 : 400,
               }}
-            />
-          )}
+            >
+              {n.l}
+            </div>
+          ))}
+          <div
+            style={{
+              borderTop: "1px solid var(--border)",
+              marginTop: 6,
+              paddingTop: 10,
+            }}
+          >
+            {session ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "6px 14px",
+                }}
+              >
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>
+                  {session.name.split(" ")[0]}
+                </span>
+                <Btn
+                  sz="sm"
+                  v="ghost"
+                  onClick={() => {
+                    logout();
+                    setMenuOpen(false);
+                  }}
+                >
+                  <LogOut size={13} />
+                  Sortir
+                </Btn>
+              </div>
+            ) : (
+              <Btn
+                sz="md"
+                v="outline"
+                full
+                onClick={() => handleNav("account")}
+              >
+                <LogIn size={13} />
+                Connexion
+              </Btn>
+            )}
+          </div>
         </div>
-      </nav>
+      )}
     </header>
   );
 }
@@ -1502,6 +1670,7 @@ function PCard({ p, onView, onAdd, featured }) {
 // ── Fiche produit ─────────────────────────────────────────────────────────────
 function ProductPage({ product: p, onBack }) {
   const { settings, addToCart, session, canInstall } = useStore();
+  const isMobile = useIsMobile();
   const [qty, setQty] = useState(1);
   const elig = canInstall(p);
   const waHref = waLink(
@@ -1509,12 +1678,24 @@ function ProductPage({ product: p, onBack }) {
     `Bonjour, je souhaite commander : ${p.name} (${fmt(p.price)})`,
   );
   return (
-    <div style={{ maxWidth: 880, margin: "56px auto", padding: "0 24px" }}>
-      <Btn v="ghost" sz="sm" onClick={onBack} style={{ marginBottom: 28 }}>
+    <div
+      style={{
+        maxWidth: 880,
+        margin: isMobile ? "24px auto" : "56px auto",
+        padding: "0 16px",
+      }}
+    >
+      <Btn v="ghost" sz="sm" onClick={onBack} style={{ marginBottom: 22 }}>
         <ArrowLeft size={13} />
         Retour
       </Btn>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: isMobile ? 24 : 48,
+        }}
+      >
         <div
           style={{
             background: "linear-gradient(145deg,#F3EEE7,#FDFAF5)",
@@ -1758,6 +1939,7 @@ function ProductPage({ product: p, onBack }) {
 // ── Panier ────────────────────────────────────────────────────────────────────
 function CartPage({ nav }) {
   const { cart, removeFromCart, cartTotal } = useStore();
+  const isMobile = useIsMobile();
   if (!cart.length)
     return (
       <div style={{ textAlign: "center", padding: "110px 24px" }}>
@@ -1783,8 +1965,20 @@ function CartPage({ nav }) {
       </div>
     );
   return (
-    <div style={{ maxWidth: 740, margin: "56px auto", padding: "0 24px" }}>
-      <h2 style={{ fontFamily: "var(--fd)", fontSize: 34, marginBottom: 28 }}>
+    <div
+      style={{
+        maxWidth: 740,
+        margin: isMobile ? "24px auto" : "56px auto",
+        padding: "0 16px",
+      }}
+    >
+      <h2
+        style={{
+          fontFamily: "var(--fd)",
+          fontSize: isMobile ? 26 : 34,
+          marginBottom: 22,
+        }}
+      >
         Votre Panier
       </h2>
       <div
@@ -1802,13 +1996,13 @@ function CartPage({ nav }) {
               background: "var(--surf)",
               border: "1px solid var(--border)",
               borderRadius: 7,
-              padding: "16px 20px",
+              padding: isMobile ? "12px 14px" : "16px 20px",
               display: "flex",
               alignItems: "center",
-              gap: 18,
+              gap: isMobile ? 10 : 18,
             }}
           >
-            <div style={{ fontSize: 32 }}>
+            <div style={{ fontSize: 32, flexShrink: 0 }}>
               {i.imgUrl ? (
                 <img
                   src={i.imgUrl}
@@ -1819,24 +2013,47 @@ function CartPage({ nav }) {
                 i.img
               )}
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: "var(--fd)", fontSize: 17 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontFamily: "var(--fd)",
+                  fontSize: isMobile ? 15 : 17,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {i.name}
               </div>
               <div style={{ fontSize: 11, color: "var(--muted)" }}>
                 {i.brand} · {i.size} · Qté : {i.qty}
               </div>
+              {isMobile && (
+                <div
+                  style={{
+                    fontFamily: "var(--fd)",
+                    fontSize: 15,
+                    color: "var(--gold)",
+                    marginTop: 3,
+                  }}
+                >
+                  {fmt(i.price * i.qty)}
+                </div>
+              )}
             </div>
-            <div
-              style={{
-                fontFamily: "var(--fd)",
-                fontSize: 18,
-                color: "var(--gold)",
-                marginRight: 14,
-              }}
-            >
-              {fmt(i.price * i.qty)}
-            </div>
+            {!isMobile && (
+              <div
+                style={{
+                  fontFamily: "var(--fd)",
+                  fontSize: 18,
+                  color: "var(--gold)",
+                  marginRight: 14,
+                  flexShrink: 0,
+                }}
+              >
+                {fmt(i.price * i.qty)}
+              </div>
+            )}
             <button
               onClick={() => removeFromCart(i.id)}
               style={{
@@ -1845,6 +2062,7 @@ function CartPage({ nav }) {
                 color: "var(--muted)",
                 cursor: "pointer",
                 padding: 4,
+                flexShrink: 0,
               }}
             >
               <X size={15} />
@@ -1986,7 +2204,7 @@ function CheckoutPage({ nav }) {
           label="Nom complet"
           value={name}
           onChange={setName}
-          placeholder="Marie Dupont"
+          placeholder="KONGNE Gilbert"
           req
         />
         <Field
@@ -2145,6 +2363,7 @@ function CheckoutPage({ nav }) {
 function AccountPage({ nav }) {
   const { session, login, register, myOrders, deliveredCount, settings } =
     useStore();
+  const isMobile = useIsMobile();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
@@ -2177,7 +2396,7 @@ function AccountPage({ nav }) {
               label="Nom complet"
               value={name}
               onChange={setName}
-              placeholder="Marie Dupont"
+              placeholder="KONGNE Gilbert"
               req
             />
           )}
@@ -2247,14 +2466,7 @@ function AccountPage({ nav }) {
           >
             <div
               style={{ color: "var(--gold)", fontWeight: 500, marginBottom: 3 }}
-            >
-              Comptes démo :
-            </div>
-            admin@lumiere.cm / admin123
-            <br />
-            vendeur@lumiere.cm / vendeur123
-            <br />
-            client@lumiere.cm / client123 ✦
+            ></div>
           </div>
         </Panel>
       </div>
@@ -2262,13 +2474,19 @@ function AccountPage({ nav }) {
   const elig =
     session.role === "client" && deliveredCount >= settings.installMinOrders;
   return (
-    <div style={{ maxWidth: 780, margin: "56px auto", padding: "0 24px" }}>
+    <div
+      style={{
+        maxWidth: 780,
+        margin: isMobile ? "24px auto" : "56px auto",
+        padding: "0 16px",
+      }}
+    >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          marginBottom: 36,
+          marginBottom: isMobile ? 20 : 36,
           flexWrap: "wrap",
           gap: 14,
         }}
@@ -2328,9 +2546,9 @@ function AccountPage({ nav }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3,1fr)",
-            gap: 12,
-            marginBottom: 32,
+            gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)",
+            gap: 10,
+            marginBottom: 24,
           }}
         >
           {[
@@ -2508,6 +2726,7 @@ function AccountPage({ nav }) {
 // ═══════════════════════════════════════════════════════════════════════════
 function AdminPage() {
   const { session } = useStore();
+  const isMobile = useIsMobile();
   const [tab, setTab] = useState("dashboard");
   const tabs = [
     { k: "dashboard", l: "Vue d'ensemble", icon: <BarChart2 size={14} /> },
@@ -2520,6 +2739,60 @@ function AdminPage() {
         ]
       : []),
   ];
+
+  if (isMobile) {
+    return (
+      <div style={{ minHeight: "calc(100vh - 62px)" }}>
+        {/* Mobile : barre d'onglets horizontale scrollable */}
+        <div
+          style={{
+            display: "flex",
+            overflowX: "auto",
+            borderBottom: "1px solid var(--border)",
+            background: "#fff",
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+          }}
+        >
+          {tabs.map((t) => (
+            <div
+              key={t.k}
+              onClick={() => setTab(t.k)}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                padding: "10px 14px",
+                cursor: "pointer",
+                borderBottom:
+                  tab === t.k
+                    ? "2px solid var(--gold)"
+                    : "2px solid transparent",
+                color: tab === t.k ? "var(--gold)" : "var(--muted)",
+                fontSize: 10,
+                letterSpacing: "0.06em",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                transition: "all .15s",
+              }}
+            >
+              {t.icon}
+              {t.l}
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: "16px 14px", overflowX: "hidden" }}>
+          {tab === "dashboard" && <TabDashboard />}
+          {tab === "products" && <TabProducts />}
+          {tab === "orders" && <TabOrders />}
+          {tab === "users" && session.role === "admin" && <TabUsers />}
+          {tab === "settings" && session.role === "admin" && <TabSettings />}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "flex", minHeight: "calc(100vh - 62px)" }}>
       <div
@@ -2724,6 +2997,7 @@ function TabProducts() {
     adjustStock,
     uploadProductImg,
   } = useStore();
+  const isMobile = useIsMobile();
   const blank = {
     name: "",
     brand: "",
@@ -2843,7 +3117,7 @@ function TabProducts() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               gap: "0 20px",
             }}
           >
@@ -3623,6 +3897,7 @@ function TabUsers() {
 
 function TabSettings() {
   const { settings, updateSettings } = useStore();
+  const isMobile = useIsMobile();
   const [draft, setDraft] = useState({ ...settings });
   const set = (k, v) => setDraft((d) => ({ ...d, [k]: v }));
   return (
@@ -3645,7 +3920,13 @@ function TabSettings() {
           Enregistrer tout
         </Btn>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: 16,
+        }}
+      >
         <Panel>
           <div
             style={{
@@ -3736,7 +4017,7 @@ function TabSettings() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               gap: "0 20px",
             }}
           >
