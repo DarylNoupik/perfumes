@@ -54,6 +54,8 @@ _gs.textContent = `
   ::-webkit-scrollbar-thumb{background:var(--gold-l);border-radius:2px}
   input,select,textarea{font-family:var(--fb)}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  @keyframes waPulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55)}70%{box-shadow:0 0 0 16px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
+  @keyframes cardReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
   .admin-tabs-scroll::-webkit-scrollbar{display:none}
   @media(max-width:768px){
     .admin-tabs-scroll{scrollbar-width:none}
@@ -78,6 +80,8 @@ const SEED_SETTINGS = {
   copyright: "© 2026 DIHU · Tous droits réservés",
   installMinOrders: 3,
   installMinPrice: 50000,
+  promoEndDate: "2026-04-05T23:59:59",
+  promoLabel: "Offre de lancement — Livraison offerte sur votre 1ère commande",
 };
 
 const SEED_PRODUCTS = [
@@ -532,6 +536,25 @@ function useIsMobile(bp = 768) {
   return isMobile;
 }
 
+function useCountdown(targetDate) {
+  const calc = () => {
+    const diff = new Date(targetDate) - new Date();
+    if (diff <= 0) return null;
+    return {
+      days: Math.floor(diff / 86400000),
+      hours: Math.floor((diff / 3600000) % 24),
+      minutes: Math.floor((diff / 60000) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    };
+  };
+  const [t, setT] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setT(calc()), 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  return t;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  FRONTEND — Composants UI purs
 // ═══════════════════════════════════════════════════════════════════════════
@@ -796,6 +819,130 @@ const ProdImg = ({ p, size = "md" }) => {
   );
 };
 
+// ── Bouton WhatsApp flottant ───────────────────────────────────────────────────
+function FloatingWhatsApp() {
+  const { settings } = useStore();
+  const waHref = waLink(
+    settings.whatsapp,
+    "Bonjour M. Ulrich ! Je souhaite passer une commande de parfums. Pouvez-vous m'aider ?",
+  );
+  return (
+    <a
+      href={waHref}
+      target="_blank"
+      rel="noreferrer"
+      title="Commander via WhatsApp"
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        zIndex: 998,
+        width: 58,
+        height: 58,
+        borderRadius: "50%",
+        background: "#25D366",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 4px 20px rgba(37,211,102,.5)",
+        animation: "waPulse 2.2s infinite",
+        textDecoration: "none",
+        transition: "transform .2s",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      <MessageCircle size={26} color="#fff" />
+    </a>
+  );
+}
+
+// ── Bannière compte à rebours ──────────────────────────────────────────────────
+function CountdownBanner() {
+  const { settings } = useStore();
+  const isMobile = useIsMobile();
+  const t = useCountdown(settings.promoEndDate);
+  if (!t) return null;
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    <div
+      style={{
+        background: "var(--text)",
+        padding: isMobile ? "16px 16px" : "18px 24px",
+        textAlign: "center",
+      }}
+    >
+      <p
+        style={{
+          color: "rgba(255,255,255,.75)",
+          fontSize: isMobile ? 11 : 12,
+          letterSpacing: "0.08em",
+          marginBottom: 12,
+          textTransform: "uppercase",
+        }}
+      >
+        {settings.promoLabel}
+      </p>
+      <div
+        style={{
+          display: "flex",
+          gap: isMobile ? 10 : 20,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {[
+          { v: t.days, l: "Jours" },
+          { v: t.hours, l: "Heures" },
+          { v: t.minutes, l: "Min" },
+          { v: t.seconds, l: "Sec" },
+        ].map(({ v, l }, i) => (
+          <div key={l} style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 20 }}>
+            {i > 0 && (
+              <span
+                style={{
+                  color: "var(--gold-l)",
+                  fontSize: isMobile ? 20 : 26,
+                  fontFamily: "var(--fd)",
+                  lineHeight: 1,
+                  marginRight: isMobile ? -6 : -12,
+                }}
+              >
+                :
+              </span>
+            )}
+            <div style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  fontFamily: "var(--fd)",
+                  fontSize: isMobile ? 28 : 38,
+                  color: "var(--gold-l)",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  minWidth: isMobile ? 38 : 52,
+                }}
+              >
+                {pad(v)}
+              </div>
+              <div
+                style={{
+                  fontSize: 8,
+                  color: "rgba(255,255,255,.4)",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  marginTop: 4,
+                }}
+              >
+                {l}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── App Root ──────────────────────────────────────────────────────────────────
 export default function App() {
   return (
@@ -846,6 +993,7 @@ function Shell() {
       )}
       <AppHeader view={view} nav={nav} />
       {view === "shop" && <ShopPage onView={openProduct} />}
+      {view === "conseils" && <ConseilsPage onView={openProduct} />}
       {view === "product" && selProduct && (
         <ProductPage product={selProduct} onBack={() => nav("shop")} />
       )}
@@ -856,6 +1004,7 @@ function Shell() {
         (session?.role === "admin" || session?.role === "vendor") && (
           <AdminPage />
         )}
+      <FloatingWhatsApp />
     </div>
   );
 }
@@ -867,6 +1016,7 @@ function AppHeader({ view, nav }) {
   const isAdmin = session?.role === "admin" || session?.role === "vendor";
   const navLinks = [
     { l: "Boutique", v: "shop" },
+    { l: "Conseils", v: "conseils" },
     { l: "Mon Compte", v: "account" },
     ...(isAdmin ? [{ l: "Dashboard", v: "admin" }] : []),
   ];
@@ -1326,6 +1476,9 @@ function ShopPage({ onView }) {
           </div>
         </div>
       </div>
+
+      {/* Compte à rebours */}
+      <CountdownBanner />
 
       <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
         <div
@@ -1930,6 +2083,593 @@ function ProductPage({ product: p, onBack }) {
               Commander par WhatsApp
             </Btn>
           </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Conseils & Tendances ──────────────────────────────────────────────────────
+const CONSEILS_DATA = [
+  {
+    productId: 1,
+    famille: "Floral Violet",
+    tendance: "Tendance 2026",
+    trendBg: "rgba(155,89,182,.12)",
+    trendColor: "#7d3c98",
+    genre: "Féminin",
+    occasions: ["Bureau", "Brunch", "Week-end"],
+    accroche: "La douceur qui reste gravée",
+    description:
+      "En 2026, les floraux violets s'imposent comme la signature olfactive des femmes modernes. Frais le matin, légèrement chauds en soirée, ils traversent les humeurs et les saisons.",
+    envie:
+      "Pour la femme qui veut être remarquée sans en avoir l'air. Violet Blossom crée une présence douce et inoubliable — le genre de parfum dont on vous demandera le nom à voix basse.",
+    conseil:
+      "Vaporisez sur le poignet et la nuque après la douche. La chaleur de la peau révèle toute sa profondeur.",
+  },
+  {
+    productId: 2,
+    famille: "Oriental Vanillé",
+    tendance: "N°1 en Afrique",
+    trendBg: "rgba(230,126,34,.12)",
+    trendColor: "#a04000",
+    genre: "Mixte",
+    occasions: ["Soirée", "Rendez-vous", "Intime"],
+    accroche: "Le parfum qui ne laisse pas indifférent",
+    description:
+      "La vanille est la senteur la plus plébiscitée en Afrique subsaharienne. Hypnotic Vanilla joue sur cette préférence culturelle profonde avec une sophistication rare à son prix.",
+    envie:
+      "Enveloppant, chaud, addictif. Ce parfum crée une aura sensuelle discrète qui donne envie de s'approcher. Parfait pour les moments que vous voulez rendre mémorables.",
+    conseil:
+      "Portez-le le soir — la chaleur corporelle amplifie les notes vanillées et prolonge le sillage jusqu'au lendemain.",
+  },
+  {
+    productId: 3,
+    famille: "Floral Oriental",
+    tendance: "Signature femme forte",
+    trendBg: "rgba(192,57,43,.1)",
+    trendColor: "#922b21",
+    genre: "Féminin",
+    occasions: ["Soirée", "Dîner chic", "Sortie"],
+    accroche: "Porter Scandal, c'est une déclaration",
+    description:
+      "Jean Paul Gaultier a créé un chef-d'œuvre de la provocation chic. Scandal domine les classements des parfums féminins les plus désirés depuis 2017 — il ne se démode pas, il s'intensifie.",
+    envie:
+      "Pour la femme qui entre dans une pièce et ne passe pas inaperçue. Le miel doré et le gardénia blanc composent un sillage opulent, sensuel, qui reste en mémoire bien après votre départ.",
+    conseil:
+      "Un seul vaporisateur suffit — Scandal est très concentré. Poignets et décolleté pour un effet maximal.",
+  },
+  {
+    productId: 4,
+    famille: "Aromatique Boisé",
+    tendance: "Classique intemporel",
+    trendBg: "rgba(44,62,80,.1)",
+    trendColor: "#1a252f",
+    genre: "Masculin",
+    occasions: ["Bureau", "Mariage", "Formel"],
+    accroche: "L'élégance qui n'a pas besoin de crier",
+    description:
+      "Legend de Mont Blanc est l'un des masculins les plus vendus dans sa catégorie depuis plus de 10 ans. Une valeur sûre qui transcende les tendances parce qu'elle incarne quelque chose de plus profond : le raffinement discret.",
+    envie:
+      "Pour l'homme accompli qui n'a pas besoin d'en faire trop. La bergamote lumineuse et le cèdre racé composent la signature olfactive de quelqu'un à qui on fait confiance instinctivement.",
+    conseil:
+      "Idéal pour le bureau et les cérémonies. Appliquez le matin — il tiendra toute la journée avec classe.",
+  },
+  {
+    productId: 7,
+    famille: "Ambre Épicé",
+    tendance: "N°1 des jeunes hommes",
+    trendBg: "rgba(243,156,18,.12)",
+    trendColor: "#9a7d0a",
+    genre: "Masculin",
+    occasions: ["Soirée", "Sport", "Séduction"],
+    accroche: "La victoire a une odeur",
+    description:
+      "Invictus Victory Elixir est le parfum masculin le plus porté par les hommes de 20-35 ans. Son ambre chaud et ses épices intenses en font une référence incontournable dans les tendances mondiales de 2025-2026.",
+    envie:
+      "Charismatique, puissant, magnétique. Ce parfum ne se porte pas — il se vit. Pour les hommes qui ont des objectifs et les atteignent, qui savent que chaque détail compte.",
+    conseil:
+      "Son sillage intense est fait pour les occasions qui comptent. Une application sur le torse suffit — il fera le reste.",
+  },
+  {
+    productId: 5,
+    famille: "Oriental Épicé",
+    tendance: "Masculin séduction",
+    trendBg: "rgba(142,68,173,.1)",
+    trendColor: "#6c3483",
+    genre: "Masculin",
+    occasions: ["Soirée", "Rendez-vous", "Week-end"],
+    accroche: "Intense. Magnétique. Inoubliable.",
+    description:
+      "La version la plus puissante du mythique Le Mâle. En 2026, les masculins orientaux épicés connaissent une renaissance portée par une génération d'hommes qui assument pleinement leur sensualité.",
+    envie:
+      "Il laisse une trace longtemps après votre départ. La cardamome épicée et la lavande profonde créent un contraste saisissant — viril et raffiné à la fois. Un paradoxe élégant.",
+    conseil:
+      "La cardamome se réveille à la chaleur du corps — portez-le proche de la peau, sur le torse et les poignets.",
+  },
+  {
+    productId: 8,
+    famille: "Boisé Fougère",
+    tendance: "Authenticité & liberté",
+    trendBg: "rgba(39,174,96,.1)",
+    trendColor: "#1e8449",
+    genre: "Masculin",
+    occasions: ["Quotidien", "Casual", "Plein air"],
+    accroche: "Pas pour tout le monde",
+    description:
+      "Only The Brave de Diesel incarne l'esprit de liberté qui séduit les 25-35 ans en quête d'authenticité. Les boisés fougères sont en forte progression sur le marché africain et mondial.",
+    envie:
+      "Pour l'homme qui fait ses propres règles. Cèdre bleu et vétiver composent un parfum qui respire l'espace et la liberté — sans chichis, sans compromis, sans chercher à plaire à tout le monde.",
+    conseil:
+      "Très polyvalent pour le quotidien. Son caractère boisé frais le rend adapté autant au travail qu'aux sorties décontractées.",
+  },
+  {
+    productId: 6,
+    famille: "Cuir Boisé",
+    tendance: "Tendance urbaine 2026",
+    trendBg: "rgba(127,85,57,.12)",
+    trendColor: "#6e2c00",
+    genre: "Mixte",
+    occasions: ["Soirée", "Urban", "Statement"],
+    accroche: "Le courage d'être différent",
+    description:
+      "Le cuir fait un retour remarqué dans les tendances mondiales. En 2025-2026, les parfums cuirés séduisent une clientèle urbaine et affirmée qui refuse les fragrances trop communes.",
+    envie:
+      "Pour ceux qui veulent une présence olfactive forte et distincte. Zara Leather est audacieux — ni timide ni agressif, juste singulier. Le parfum de ceux qui n'ont pas besoin d'être comme les autres.",
+    conseil:
+      "Laissez-le se développer sur la peau 15 minutes avant de sortir. Le cuir évolue magnifiquement à la chaleur corporelle.",
+  },
+];
+
+function ConseilsPage({ onView }) {
+  const { products, addToCart, settings } = useStore();
+  const isMobile = useIsMobile();
+  const [filtre, setFiltre] = useState("Tous");
+  const filtres = ["Tous", "Féminin", "Masculin", "Mixte"];
+
+  const visible = CONSEILS_DATA.filter(
+    (c) => filtre === "Tous" || c.genre === filtre,
+  );
+
+  const waHref = waLink(
+    settings.whatsapp,
+    "Bonjour M. Ulrich ! J'ai vu vos conseils parfums et je voudrais commander.",
+  );
+
+  return (
+    <div>
+      {/* Hero conseils */}
+      <div
+        style={{
+          background:
+            "linear-gradient(160deg,#2A2118 0%,#3D2B1A 50%,#2A2118 100%)",
+          padding: isMobile ? "48px 20px" : "72px 24px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 9,
+            letterSpacing: "0.45em",
+            textTransform: "uppercase",
+            color: "var(--gold-l)",
+            marginBottom: 18,
+          }}
+        >
+          Maison DIHU · Expertise Parfums
+        </div>
+        <h1
+          style={{
+            fontFamily: "var(--fd)",
+            fontSize: isMobile ? "clamp(32px,8vw,52px)" : "clamp(42px,5vw,66px)",
+            fontWeight: 300,
+            color: "#FAF7F2",
+            lineHeight: 1.1,
+            marginBottom: 18,
+          }}
+        >
+          Conseils &{" "}
+          <em style={{ color: "var(--gold-l)", fontStyle: "italic" }}>
+            Tendances
+          </em>
+        </h1>
+        <p
+          style={{
+            fontSize: 14,
+            color: "rgba(250,247,242,.55)",
+            maxWidth: 520,
+            margin: "0 auto 32px",
+            lineHeight: 1.85,
+          }}
+        >
+          Chaque parfum raconte une histoire. Découvrez lequel est fait pour
+          vous, selon votre personnalité, vos occasions et les tendances du
+          marché en 2026.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: isMobile ? 24 : 48,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            { v: "8", l: "Fragrances" },
+            { v: "5", l: "Familles olfactives" },
+            { v: "2026", l: "Sélection" },
+          ].map((s) => (
+            <div key={s.l} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  fontFamily: "var(--fd)",
+                  fontSize: isMobile ? 28 : 36,
+                  color: "var(--gold-l)",
+                  fontWeight: 500,
+                }}
+              >
+                {s.v}
+              </div>
+              <div
+                style={{
+                  fontSize: 9,
+                  color: "rgba(250,247,242,.4)",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  marginTop: 3,
+                }}
+              >
+                {s.l}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Filtres genre */}
+      <div
+        style={{
+          background: "var(--surf)",
+          borderBottom: "1px solid var(--border)",
+          padding: "14px 24px",
+          display: "flex",
+          justifyContent: "center",
+          gap: 8,
+          flexWrap: "wrap",
+        }}
+      >
+        {filtres.map((f) => (
+          <span
+            key={f}
+            onClick={() => setFiltre(f)}
+            style={{
+              padding: "6px 18px",
+              borderRadius: 20,
+              fontSize: 11,
+              cursor: "pointer",
+              letterSpacing: "0.08em",
+              border: `1px solid ${filtre === f ? "var(--gold)" : "var(--border)"}`,
+              background: filtre === f ? "var(--gold-dim)" : "transparent",
+              color: filtre === f ? "var(--gold)" : "var(--muted)",
+              transition: "all .15s",
+            }}
+          >
+            {f}
+          </span>
+        ))}
+      </div>
+
+      {/* Grille de conseils */}
+      <div
+        style={{
+          maxWidth: 1160,
+          margin: "0 auto",
+          padding: isMobile ? "32px 16px 60px" : "52px 24px 80px",
+          display: "grid",
+          gridTemplateColumns: isMobile
+            ? "1fr"
+            : "repeat(auto-fill,minmax(340px,1fr))",
+          gap: isMobile ? 20 : 28,
+        }}
+      >
+        {visible.map((c, idx) => {
+          const product = products.find((p) => p.id === c.productId);
+          if (!product) return null;
+          return (
+            <ConseilCard
+              key={c.productId}
+              c={c}
+              product={product}
+              onView={onView}
+              onAdd={() => addToCart(product)}
+              idx={idx}
+            />
+          );
+        })}
+      </div>
+
+      {/* CTA bas de page */}
+      <div
+        style={{
+          background:
+            "linear-gradient(135deg,rgba(154,110,46,.08) 0%,rgba(201,168,76,.04) 100%)",
+          borderTop: "1px solid var(--border)",
+          padding: isMobile ? "40px 20px" : "60px 24px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--fd)",
+            fontSize: isMobile ? 24 : 32,
+            marginBottom: 12,
+          }}
+        >
+          Vous ne savez toujours pas lequel choisir ?
+        </div>
+        <p
+          style={{
+            fontSize: 13,
+            color: "var(--muted)",
+            marginBottom: 24,
+            lineHeight: 1.75,
+          }}
+        >
+          Décrivez votre personnalité, votre occasion ou votre budget — nous
+          vous guidons vers le parfum idéal.
+        </p>
+        <a href={waHref} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+          <Btn sz="lg" v="wa">
+            <MessageCircle size={15} />
+            Demandez conseil sur WhatsApp
+          </Btn>
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function ConseilCard({ c, product, onView, onAdd, idx }) {
+  const { settings } = useStore();
+  const isMobile = useIsMobile();
+  const [hov, setHov] = useState(false);
+  const waHref = waLink(
+    settings.whatsapp,
+    `Bonjour M. Ulrich ! Je suis intéressé(e) par le parfum ${product.name} (${fmt(product.price)}). Pouvez-vous m'aider ?`,
+  );
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: "var(--surf)",
+        border: `1px solid ${hov ? "rgba(154,110,46,.3)" : "var(--border)"}`,
+        borderRadius: 12,
+        overflow: "hidden",
+        transition: "all .3s",
+        transform: hov ? "translateY(-6px)" : "none",
+        boxShadow: hov ? "0 20px 48px rgba(42,33,24,.13)" : "none",
+        animation: `cardReveal .4s ease ${idx * 0.06}s both`,
+      }}
+    >
+      {/* Image */}
+      <div
+        onClick={() => onView(product)}
+        style={{
+          cursor: "pointer",
+          position: "relative",
+          background: "linear-gradient(145deg,#F3EEE7,#FDFAF5)",
+        }}
+      >
+        <ProdImg p={product} size="md" />
+        {/* Badge tendance */}
+        <div style={{ position: "absolute", top: 12, left: 12 }}>
+          <span
+            style={{
+              background: c.trendBg,
+              color: c.trendColor,
+              border: `1px solid ${c.trendColor}33`,
+              padding: "3px 10px",
+              borderRadius: 20,
+              fontSize: 9,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+            }}
+          >
+            {c.tendance}
+          </span>
+        </div>
+        {/* Badge genre */}
+        <div style={{ position: "absolute", top: 12, right: 12 }}>
+          <span
+            style={{
+              background: "rgba(42,33,24,.6)",
+              color: "#FAF7F2",
+              padding: "3px 10px",
+              borderRadius: 20,
+              fontSize: 9,
+              letterSpacing: "0.08em",
+            }}
+          >
+            {c.genre}
+          </span>
+        </div>
+      </div>
+
+      {/* Contenu */}
+      <div style={{ padding: isMobile ? "18px 16px 20px" : "20px 22px 24px" }}>
+        {/* Famille + nom */}
+        <div
+          style={{
+            fontSize: 9,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--muted)",
+            marginBottom: 4,
+          }}
+        >
+          {c.famille} · {product.brand}
+        </div>
+        <h3
+          onClick={() => onView(product)}
+          style={{
+            fontFamily: "var(--fd)",
+            fontSize: 22,
+            fontWeight: 400,
+            marginBottom: 6,
+            cursor: "pointer",
+            lineHeight: 1.1,
+          }}
+        >
+          {product.name}
+        </h3>
+
+        {/* Accroche */}
+        <p
+          style={{
+            fontFamily: "var(--fd)",
+            fontSize: 14,
+            fontStyle: "italic",
+            color: "var(--gold)",
+            marginBottom: 12,
+            lineHeight: 1.5,
+          }}
+        >
+          "{c.accroche}"
+        </p>
+
+        {/* Occasions */}
+        <div
+          style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 14 }}
+        >
+          {c.occasions.map((o) => (
+            <span
+              key={o}
+              style={{
+                fontSize: 9,
+                padding: "3px 9px",
+                background: "var(--surf2)",
+                border: "1px solid var(--border)",
+                borderRadius: 20,
+                color: "var(--muted)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              {o}
+            </span>
+          ))}
+        </div>
+
+        {/* Séparateur */}
+        <div
+          style={{
+            height: 1,
+            background:
+              "linear-gradient(to right,var(--border),transparent)",
+            marginBottom: 14,
+          }}
+        />
+
+        {/* Tendance marché */}
+        <p
+          style={{
+            fontSize: 12,
+            color: "var(--muted)",
+            lineHeight: 1.75,
+            marginBottom: 12,
+          }}
+        >
+          {c.description}
+        </p>
+
+        {/* L'envie */}
+        <div
+          style={{
+            background: "rgba(154,110,46,.04)",
+            border: "1px solid rgba(154,110,46,.18)",
+            borderRadius: 7,
+            padding: "12px 14px",
+            marginBottom: 14,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--gold)",
+              marginBottom: 5,
+            }}
+          >
+            L'envie
+          </div>
+          <p
+            style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.75 }}
+          >
+            {c.envie}
+          </p>
+        </div>
+
+        {/* Conseil pratique */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "flex-start",
+            marginBottom: 18,
+          }}
+        >
+          <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+          <p
+            style={{
+              fontSize: 11,
+              color: "var(--muted)",
+              lineHeight: 1.65,
+              fontStyle: "italic",
+            }}
+          >
+            {c.conseil}
+          </p>
+        </div>
+
+        {/* Prix + CTA */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingTop: 14,
+            borderTop: "1px solid var(--border)",
+            flexWrap: "wrap",
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--fd)",
+              fontSize: 22,
+              color: "var(--gold)",
+              fontWeight: 500,
+            }}
+          >
+            {fmt(product.price)}
+          </div>
+          <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+            <Btn sz="sm" onClick={() => onView(product)}>
+              Voir le parfum
+            </Btn>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              <Btn sz="sm" v="wa">
+                <MessageCircle size={12} />
+                Commander
+              </Btn>
+            </a>
+          </div>
         </div>
       </div>
     </div>
