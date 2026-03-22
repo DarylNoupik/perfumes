@@ -992,7 +992,9 @@ function Shell() {
         </div>
       )}
       <AppHeader view={view} nav={nav} />
-      {view === "shop" && <ShopPage onView={openProduct} />}
+      {view === "shop" && (
+        <ShopPage onView={openProduct} onConseils={() => nav("conseils")} />
+      )}
       {view === "conseils" && <ConseilsPage onView={openProduct} />}
       {view === "product" && selProduct && (
         <ProductPage product={selProduct} onBack={() => nav("shop")} />
@@ -1277,8 +1279,9 @@ function AppHeader({ view, nav }) {
 }
 
 // ── Boutique ──────────────────────────────────────────────────────────────────
-function ShopPage({ onView }) {
+function ShopPage({ onView, onConseils }) {
   const { settings, products, addToCart } = useStore();
+  const isMobile = useIsMobile();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tous");
   const cats = ["Tous", ...new Set(products.map((p) => p.cat).filter(Boolean))];
@@ -1488,6 +1491,159 @@ function ShopPage({ onView }) {
               "linear-gradient(to right,transparent,var(--border),transparent)",
           }}
         />
+      </div>
+
+      {/* ── Teaser Conseils ── */}
+      <div
+        style={{
+          maxWidth: 1160,
+          margin: "0 auto",
+          padding: isMobile ? "32px 16px" : "48px 24px",
+        }}
+      >
+        <div
+          onClick={onConseils}
+          style={{
+            cursor: "pointer",
+            background:
+              "linear-gradient(135deg,#2A2118 0%,#3D2B1A 60%,#2A2118 100%)",
+            borderRadius: 12,
+            padding: isMobile ? "28px 22px" : "40px 52px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 24,
+            flexWrap: "wrap",
+            position: "relative",
+            overflow: "hidden",
+            transition: "transform .25s, box-shadow .25s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-3px)";
+            e.currentTarget.style.boxShadow =
+              "0 20px 52px rgba(42,33,24,.35)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "";
+            e.currentTarget.style.boxShadow = "";
+          }}
+        >
+          {/* Motif décoratif */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "radial-gradient(circle,rgba(201,168,76,.07) 1px,transparent 1px)",
+              backgroundSize: "28px 28px",
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              right: isMobile ? -30 : 40,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontFamily: "var(--fd)",
+              fontSize: isMobile ? 90 : 140,
+              color: "rgba(201,168,76,.06)",
+              fontStyle: "italic",
+              pointerEvents: "none",
+              lineHeight: 1,
+              userSelect: "none",
+            }}
+          >
+            DIHU
+          </div>
+
+          {/* Texte */}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div
+              style={{
+                fontSize: 9,
+                letterSpacing: "0.38em",
+                textTransform: "uppercase",
+                color: "var(--gold-l)",
+                marginBottom: 10,
+              }}
+            >
+              Nouveau · Guide exclusif
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--fd)",
+                fontSize: isMobile ? 24 : 34,
+                fontWeight: 300,
+                color: "#FAF7F2",
+                lineHeight: 1.15,
+                marginBottom: 12,
+              }}
+            >
+              Vous ne savez pas quel parfum{" "}
+              <em style={{ color: "var(--gold-l)", fontStyle: "italic" }}>
+                vous correspond ?
+              </em>
+            </h2>
+            <p
+              style={{
+                fontSize: 13,
+                color: "rgba(250,247,242,.5)",
+                lineHeight: 1.8,
+                maxWidth: 460,
+                marginBottom: isMobile ? 18 : 0,
+              }}
+            >
+              Tendances marché, conseils de port, profils olfactifs — notre
+              guide vous aide à trouver{" "}
+              <strong style={{ color: "rgba(250,247,242,.8)" }}>
+                le parfum fait pour vous
+              </strong>{" "}
+              en moins de 2 minutes.
+            </p>
+          </div>
+
+          {/* CTA */}
+          <div
+            style={{
+              position: "relative",
+              zIndex: 1,
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: isMobile ? "flex-start" : "center",
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                background: "var(--gold)",
+                color: "#fff",
+                padding: "12px 28px",
+                borderRadius: 4,
+                fontSize: 12,
+                fontWeight: 500,
+                letterSpacing: "0.08em",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Voir les conseils
+              <ChevronRight size={14} />
+            </div>
+            <span
+              style={{
+                fontSize: 10,
+                color: "rgba(250,247,242,.35)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              Gratuit · 8 parfums analysés
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Catalogue */}
