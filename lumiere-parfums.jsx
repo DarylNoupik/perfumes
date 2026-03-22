@@ -73,7 +73,7 @@ const SEED_SETTINGS = {
   tagline: "Maison de Parfums",
   heroTitle: "L'Art du Parfum Rare",
   heroSubtitle:
-    "Des fragrances d'exception, sélectionnées pour les connaisseurs. Livraison partout au Douala.",
+    "Des fragrances d'exception, sélectionnées pour les connaisseurs. Livraison partout à Douala.",
   heroLabel: "Collection Exclusive ·",
   city: "Douala, Cameroun",
   whatsapp: "237656493976",
@@ -897,7 +897,14 @@ function CountdownBanner() {
           { v: t.minutes, l: "Min" },
           { v: t.seconds, l: "Sec" },
         ].map(({ v, l }, i) => (
-          <div key={l} style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 20 }}>
+          <div
+            key={l}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: isMobile ? 10 : 20,
+            }}
+          >
             {i > 0 && (
               <span
                 style={{
@@ -1520,8 +1527,7 @@ function ShopPage({ onView, onConseils }) {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-3px)";
-            e.currentTarget.style.boxShadow =
-              "0 20px 52px rgba(42,33,24,.35)";
+            e.currentTarget.style.boxShadow = "0 20px 52px rgba(42,33,24,.35)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "";
@@ -2417,7 +2423,9 @@ function ConseilsPage({ onView }) {
         <h1
           style={{
             fontFamily: "var(--fd)",
-            fontSize: isMobile ? "clamp(32px,8vw,52px)" : "clamp(42px,5vw,66px)",
+            fontSize: isMobile
+              ? "clamp(32px,8vw,52px)"
+              : "clamp(42px,5vw,66px)",
             fontWeight: 300,
             color: "#FAF7F2",
             lineHeight: 1.1,
@@ -2574,7 +2582,12 @@ function ConseilsPage({ onView }) {
           Décrivez votre personnalité, votre occasion ou votre budget — nous
           vous guidons vers le parfum idéal.
         </p>
-        <a href={waHref} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+        <a
+          href={waHref}
+          target="_blank"
+          rel="noreferrer"
+          style={{ textDecoration: "none" }}
+        >
           <Btn sz="lg" v="wa">
             <MessageCircle size={15} />
             Demandez conseil sur WhatsApp
@@ -2696,7 +2709,12 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
 
         {/* Occasions */}
         <div
-          style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 14 }}
+          style={{
+            display: "flex",
+            gap: 5,
+            flexWrap: "wrap",
+            marginBottom: 14,
+          }}
         >
           {c.occasions.map((o) => (
             <span
@@ -2720,8 +2738,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
         <div
           style={{
             height: 1,
-            background:
-              "linear-gradient(to right,var(--border),transparent)",
+            background: "linear-gradient(to right,var(--border),transparent)",
             marginBottom: 14,
           }}
         />
@@ -2759,9 +2776,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
           >
             L'envie
           </div>
-          <p
-            style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.75 }}
-          >
+          <p style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.75 }}>
             {c.envie}
           </p>
         </div>
