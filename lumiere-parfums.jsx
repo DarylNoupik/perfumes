@@ -94,7 +94,7 @@ const SEED_PRODUCTS = [
     cat: "Zara",
     desc: "Un bouquet floral violet délicat aux notes de violette, musc blanc et bois doux. Fraîcheur féminine et accessible.",
     notes: ["Violette", "Musc blanc", "Bois"],
-    size: "180 ml",
+    size: "90x2 ml",
     img: "🌸",
     imgUrl:
       "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774129442/violet_blossom_fluewi.jpg",
@@ -104,12 +104,12 @@ const SEED_PRODUCTS = [
     id: 2,
     name: "Red Temptation",
     brand: "Zara",
-    price: 30000,
+    price: 22500,
     stock: 2,
     cat: "Zara",
     desc: "Une tentation rouge et sensuelle aux notes fruitées et boisées. Caractère affirmé, sillage magnétique signature Zara.",
     notes: ["Fruits rouges", "Bois", "Musc"],
-    size: "80 ml",
+    size: "50 ml",
     img: "🔴",
     imgUrl:
       "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774377418/red_temptation_b9p2fl.jpg",
@@ -2553,7 +2553,7 @@ function ConseilsPage({ onView }) {
           }}
         >
           {[
-            { v: "8", l: "Fragrances" },
+            { v: "10", l: "Fragrances" },
             { v: "5", l: "Familles olfactives" },
             { v: "2026", l: "Sélection" },
           ].map((s) => (
