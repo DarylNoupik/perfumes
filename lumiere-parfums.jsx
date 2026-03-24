@@ -102,17 +102,17 @@ const SEED_PRODUCTS = [
   },
   {
     id: 2,
-    name: "Hypnotic Vanilla EDP",
+    name: "Red Temptation",
     brand: "Zara",
     price: 30000,
     stock: 2,
     cat: "Zara",
-    desc: "Vanille hypnotique et enveloppante, rehaussée de notes boisées et musquées. Douceur addictive signature Zara.",
-    notes: ["Vanille", "Musc", "Bois"],
+    desc: "Une tentation rouge et sensuelle aux notes fruitées et boisées. Caractère affirmé, sillage magnétique signature Zara.",
+    notes: ["Fruits rouges", "Bois", "Musc"],
     size: "80 ml",
-    img: "🍬",
+    img: "🔴",
     imgUrl:
-      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774129441/Hypnotic_vanilla_EDP_ZARA_kzdmwf.jpg",
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774377418/red_temptation_b9p2fl.jpg",
     featured: true,
   },
   {
@@ -203,6 +203,36 @@ const SEED_PRODUCTS = [
     img: "✊",
     imgUrl:
       "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774129114/diesel_only_brave_xli91v.avif",
+    featured: false,
+  },
+  {
+    id: 9,
+    name: "Golden Decade",
+    brand: "Zara",
+    price: 30000,
+    stock: 2,
+    cat: "Zara",
+    desc: "Une fragrance dorée et lumineuse aux accents orientaux. Chaleur enveloppante, élégance intemporelle signée Zara.",
+    notes: ["Ambre", "Bois doré", "Musc"],
+    size: "80 ml",
+    img: "✨",
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774377418/Golden_decade_dnsk9b.jpg",
+    featured: true,
+  },
+  {
+    id: 10,
+    name: "Orchid & Wonder Rose",
+    brand: "Zara",
+    price: 30000,
+    stock: 2,
+    cat: "Zara",
+    desc: "Orchidée envoûtante aux effluves floraux poudrés. Douceur féminine et raffinée, une fleur rare au quotidien. et Rose majestueuse et envoûtante. Une interprétation moderne et lumineuse de la reine des fleurs, douce et romantique.",
+    notes: ["Orchidée", "Poudre", "Musc blanc", "Rose", "Pivoine"],
+    size: "50 x 2 ml",
+    img: "🌺",
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1774377419/Orchid_luyqjc.jpg",
     featured: false,
   },
 ];
@@ -582,9 +612,9 @@ const Badge = ({ children, c = "gold" }) => {
       b: "rgba(255,152,0,.3)",
     },
     blue: {
-      bg: "rgba(33,150,243,.1)",
+      bg: "rgba(21,101,192,.18)",
       color: "#1565c0",
-      b: "rgba(33,150,243,.3)",
+      b: "rgba(21,101,192,.5)",
     },
   };
   const s = m[c] || m.gold;
@@ -1646,7 +1676,7 @@ function ShopPage({ onView, onConseils }) {
                 letterSpacing: "0.06em",
               }}
             >
-              Gratuit · 8 parfums analysés
+              Gratuit · 10 parfums analysés
             </span>
           </div>
         </div>
@@ -1859,7 +1889,23 @@ function PCard({ p, onView, onAdd, featured }) {
         )}
         {p.price > settings.installMinPrice && (
           <div style={{ position: "absolute", bottom: 8, right: 8 }}>
-            <Badge c="blue">Paiement en tranches</Badge>
+            <span
+              style={{
+                background: "rgba(21,101,192,.85)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,.25)",
+                padding: "3px 10px",
+                borderRadius: 20,
+                fontSize: 10,
+                fontWeight: 600,
+                letterSpacing: "0.05em",
+                display: "inline-block",
+                whiteSpace: "nowrap",
+                backdropFilter: "blur(4px)",
+              }}
+            >
+              Paiement en tranches
+            </span>
           </div>
         )}
       </div>
@@ -2127,8 +2173,8 @@ function ProductPage({ product: p, onBack }) {
             <Panel
               style={{
                 marginBottom: 18,
-                background: "rgba(154,110,46,.03)",
-                borderColor: "rgba(154,110,46,.25)",
+                background: "rgba(154,110,46,.1)",
+                borderColor: "rgba(154,110,46,.45)",
               }}
             >
               <div
@@ -2166,8 +2212,8 @@ function ProductPage({ product: p, onBack }) {
             <Panel
               style={{
                 marginBottom: 18,
-                background: "rgba(33,150,243,.03)",
-                borderColor: "rgba(33,150,243,.2)",
+                background: "rgba(33,150,243,.1)",
+                borderColor: "rgba(33,150,243,.45)",
               }}
             >
               <p style={{ fontSize: 11, color: "#1565c0", lineHeight: 1.65 }}>
@@ -2271,19 +2317,19 @@ const CONSEILS_DATA = [
   },
   {
     productId: 2,
-    famille: "Oriental Vanillé",
-    tendance: "N°1 en Afrique",
-    trendBg: "rgba(230,126,34,.12)",
-    trendColor: "#a04000",
-    genre: "Mixte",
-    occasions: ["Soirée", "Rendez-vous", "Intime"],
-    accroche: "Le parfum qui ne laisse pas indifférent",
+    famille: "Fruité Boisé",
+    tendance: "Séduction audacieuse",
+    trendBg: "rgba(192,57,43,.12)",
+    trendColor: "#922b21",
+    genre: "Féminin",
+    occasions: ["Soirée", "Rendez-vous", "Sortie"],
+    accroche: "La tentation à laquelle on ne résiste pas",
     description:
-      "La vanille est la senteur la plus plébiscitée en Afrique subsaharienne. Hypnotic Vanilla joue sur cette préférence culturelle profonde avec une sophistication rare à son prix.",
+      "Red Temptation de Zara s'impose comme l'un des parfums féminins les plus remarqués de 2025-2026. Son caractère fruité et boisé crée un contraste saisissant — doux en surface, magnétique en profondeur.",
     envie:
-      "Enveloppant, chaud, addictif. Ce parfum crée une aura sensuelle discrète qui donne envie de s'approcher. Parfait pour les moments que vous voulez rendre mémorables.",
+      "Pour la femme qui assume sa séduction sans effort. Les fruits rouges éclatants et le fond boisé musqué composent un sillage à la fois lumineux et enveloppant — irrésistible.",
     conseil:
-      "Portez-le le soir — la chaleur corporelle amplifie les notes vanillées et prolonge le sillage jusqu'au lendemain.",
+      "Vaporisez sur les poignets et le décolleté avant de sortir. Le sillage évolue magnifiquement au fil de la soirée.",
   },
   {
     productId: 3,
@@ -2380,6 +2426,54 @@ const CONSEILS_DATA = [
       "Pour ceux qui veulent une présence olfactive forte et distincte. Zara Leather est audacieux — ni timide ni agressif, juste singulier. Le parfum de ceux qui n'ont pas besoin d'être comme les autres.",
     conseil:
       "Laissez-le se développer sur la peau 15 minutes avant de sortir. Le cuir évolue magnifiquement à la chaleur corporelle.",
+  },
+  {
+    productId: 9,
+    famille: "Oriental Doré",
+    tendance: "Tendance luxe accessible",
+    trendBg: "rgba(212,172,13,.12)",
+    trendColor: "#9a7d0a",
+    genre: "Mixte",
+    occasions: ["Soirée", "Mariage", "Occasions spéciales"],
+    accroche: "L'or liquide en flacon",
+    description:
+      "Golden Decade incarne la montée en puissance des orientaux dorés dans les tendances 2025-2026. Les fragrances ambrées et boisées à caractère luxueux séduisent une clientèle qui veut l'élégance sans sacrifier l'accessibilité.",
+    envie:
+      "Pour ceux qui veulent marquer les esprits lors des grandes occasions. Golden Decade dégage une chaleur dorée et enveloppante qui évoque le luxe, la fête et les souvenirs qui durent.",
+    conseil:
+      "Idéal pour les mariages et soirées. Appliquez sur le cou et les poignets — la chaleur du corps révèle progressivement ses notes ambrées et boisées tout au long de la nuit.",
+  },
+  {
+    productId: 10,
+    famille: "Floral Poudré",
+    tendance: "Féminité intemporelle",
+    trendBg: "rgba(218,112,214,.12)",
+    trendColor: "#8e44ad",
+    genre: "Féminin",
+    occasions: ["Bureau", "Brunch", "Quotidien"],
+    accroche: "La fleur rare du quotidien",
+    description:
+      "L'orchidée s'impose comme l'une des fleurs phares de la parfumerie féminine contemporaine. Rare, sophistiquée et délicate, elle symbolise en 2026 une féminité assumée et raffinée.",
+    envie:
+      "Pour la femme douce et élégante qui aime les fragrances florales sans excès. Orchid enveloppe avec grâce — une présence olfactive subtile qui accompagne sans envahir.",
+    conseil:
+      "Parfait pour le bureau ou les sorties diurnes. Vaporisez sur les poignets et la nuque le matin — sa douceur poudrée tiendra tout au long de la journée.",
+  },
+  {
+    productId: 11,
+    famille: "Floral Rose",
+    tendance: "Romance moderne",
+    trendBg: "rgba(231,76,60,.1)",
+    trendColor: "#c0392b",
+    genre: "Féminin",
+    occasions: ["Rendez-vous", "Week-end", "Casual chic"],
+    accroche: "La rose réinventée",
+    description:
+      "Wonder Rose renouvelle l'amour éternel de la parfumerie pour la reine des fleurs. En 2026, les roses modernes abandonnent le côté poussiéreux pour une interprétation lumineuse et dynamique qui séduit toutes les générations.",
+    envie:
+      "Pour la femme romantique et moderne à la fois. Wonder Rose est une rose vibrante et lumineuse qui sent la fraîcheur, la féminité et la confiance — le genre de parfum qui met de bonne humeur.",
+    conseil:
+      "Idéal pour les rendez-vous et sorties du week-end. Appliquez sur le poignet et derrière les oreilles — la rose se révèle pleinement à la chaleur de la peau.",
   },
 ];
 
