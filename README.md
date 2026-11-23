@@ -10,29 +10,32 @@ Commandes via panier intégré ou directement par **WhatsApp**.
 | Outil | Version | Rôle |
 |---|---|---|
 | React | 18.3 | UI / logique |
-| Vite | 5.2 | Bundler / dev server |
+| Vite | 8.3 | Bundler / dev server |
 | lucide-react | 0.378 | Icônes |
 | Cloudinary | CDN | Hébergement des images |
 
-Aucune dépendance CSS externe — tout le style est en **inline styles** + injections CSS globales.
+Les styles partagés sont dans `src/global.css`. Les composants définissent leurs styles locaux en JSX.
 
 ---
 
 ## Structure du projet
 
 ```
-app-construction/
-├── lumiere-parfums.jsx   # Source unique — backend (store) + frontend (UI)
-├── src/
-│   └── main.jsx          # Point d'entrée React
-├── vite.config.js
-└── package.json
+src/
+├── main.jsx              # Point d’entrée React
+├── App.jsx               # Navigation et affichage des pages
+├── features/             # Catalogue, conseils, panier, compte et administration
+├── layout/               # En-tête et bouton WhatsApp
+├── components/           # Éléments d’interface partagés
+├── store/                # État React et opérations de la boutique
+├── config/               # Paramètres et numéro WhatsApp
+├── data/                 # Catalogue et données de démonstration
+├── hooks/                # Hooks liés au navigateur
+├── lib/                  # Format monétaire et liens WhatsApp
+└── global.css            # Styles partagés
 ```
 
-L'application est contenue dans un **seul fichier** `lumiere-parfums.jsx`, organisé en deux grandes sections :
-
-- **Backend** : données seed, store global (`Context API`), logique métier (auth, panier, commandes, produits, paramètres)
-- **Frontend** : composants UI purs (`AppHeader`, `ShopPage`, `ProductPage`, `CartPage`, `CheckoutPage`, `AccountPage`, `AdminPage`, …)
+Les pages accèdent à l’état et aux opérations de la boutique via `useStore`.
 
 ---
 
@@ -129,9 +132,22 @@ Dans l'admin, les images peuvent être mises à jour en collant une URL CDN (Clo
 
 ---
 
+## Suivi des parfums
+
+Dans l’administration, **Suivi des parfums** regroupe la synthèse par sexe, le stock, la rentabilité, les ventes, les entrées et les paramètres de suivi. Renseignez les coûts et les frais par flacon pour calculer les marges. Les commandes livrées et les ventes manuelles alimentent le journal des ventes.
+
+Dans **Ventes**, **Importer les ventes Excel** reprend les lignes historiques du classeur de suivi `.xlsx` et complète les références, les catégories et les coûts de l’onglet **Stock ROI** pour les parfums reconnus. Si le prix réel est vide, le calcul utilise le prix prévu. Les ventes importées alimentent la vue d’ensemble et la rentabilité sans modifier le stock disponible ni écraser les réglages déjà saisis.
+
+## Connexion Supabase
+
+Copiez `.env.example` vers `.env.local` et renseignez `VITE_SUPABASE_PUBLISHABLE_KEY` à partir de **Connect** dans Supabase. Reportez les deux variables dans Vercel avant de redéployer. Si les deux variables sont présentes, le catalogue, les commandes et le suivi utilisent la base partagée. En développement sans ces variables, la boutique utilise le mode de démonstration et le stockage local du navigateur.
+
+L’accès administrateur repose sur le rôle `admin` dans les métadonnées d’application de Supabase Auth. La confirmation par e-mail utilise l’origine du site. Ajoutez l’URL locale et celle de production à la liste des redirections autorisées dans **Authentication → URL Configuration**.
+
 ## Contact & commandes
 
-WhatsApp : **+237 656 493 976**
+Définir `VITE_CONTACT_WHATSAPP_NUMBER` dans `.env.local` en développement ou dans les variables d’environnement du projet Vercel, puis relancer le serveur ou le déploiement. Utiliser le numéro au format international, sans `+` ni espaces.
+
 Livraison : Douala, Cameroun
 
 ---
