@@ -261,7 +261,8 @@ const SEED_PRODUCTS = [
     notes: ["Bergamote", "Thé noir", "Bois"],
     size: "100 ml",
     img: "🎩",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437857/Fashionably_London_pdvzah.jpg",
     featured: true,
   },
   {
@@ -289,7 +290,8 @@ const SEED_PRODUCTS = [
     notes: ["Fleurs blanches", "Fruits", "Musc"],
     size: "100 ml",
     img: "💐",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437856/Nude_Bouquet_zzo3mk.jpg",
     featured: false,
   },
   {
@@ -303,7 +305,8 @@ const SEED_PRODUCTS = [
     notes: ["Fruits", "Fleurs", "Vanille"],
     size: "100 ml",
     img: "🌷",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437855/Shades_of_Bliss_tr7lrg.avif",
     featured: false,
   },
   {
@@ -317,7 +320,8 @@ const SEED_PRODUCTS = [
     notes: ["Épices", "Bois", "Ambre"],
     size: "100 ml",
     img: "🌑",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437855/Red_Eclipse_tvlche.jpg",
     featured: false,
   },
   {
@@ -466,7 +470,8 @@ const SEED_PRODUCTS = [
     notes: ["Fruits", "Fleurs", "Musc"],
     size: "100 ml",
     img: "💋",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437856/Shades_of_Lust_sfkqns.webp",
     featured: false,
   },
   {
