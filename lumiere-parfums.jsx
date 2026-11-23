@@ -17,6 +17,7 @@ import {
   BarChart2,
   X,
   ChevronLeft,
+  Maximize2,
   ChevronRight,
   LogIn,
   LogOut,
@@ -55,6 +56,10 @@ _gs.textContent = `
   ::-webkit-scrollbar-thumb{background:var(--gold-l);border-radius:2px}
   input,select,textarea{font-family:var(--fb)}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+  @keyframes lbIn{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  }
   @keyframes waPulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55)}70%{box-shadow:0 0 0 16px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
   @keyframes cardReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
   .admin-tabs-scroll::-webkit-scrollbar{display:none}
@@ -1172,18 +1177,64 @@ const Panel = ({ children, style: s = {} }) => (
   </div>
 );
 
-const ProdImg = ({ p, size = "md" }) => {
+const ProdImg = ({ p, size = "md", zoom = false }) => {
   const [err, setErr] = useState(false);
   const sz = {
     sm: { h: 120, fs: 38 },
     md: { h: 170, fs: 52 },
     lg: { h: 300, fs: 100 },
-    card: { ratio: "1 / 1", fs: 52 },
+    card: { ratio: "4 / 5", fs: 52 },
   }[size];
-  // Format carré pour les cartes : le flacon reste entier (contain)
   const box = sz.ratio
     ? { aspectRatio: sz.ratio, width: "100%" }
     : { height: sz.h };
+  // Format immersif : la photo floutée remplit le cadre, le flacon reste entier par-dessus
+  if (p.imgUrl && !err && sz.ratio)
+    return (
+      <div
+        style={{
+          ...box,
+          position: "relative",
+          overflow: "hidden",
+          background: "#F5F0E8",
+        }}
+      >
+        <img
+          src={p.imgUrl}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "blur(40px) saturate(1.1) brightness(1.08)",
+            transform: "scale(1.4)",
+            opacity: 0.35,
+          }}
+        />
+        <img
+          src={p.imgUrl}
+          alt={p.name}
+          loading="lazy"
+          onError={() => setErr(true)}
+          className="prod-img"
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            display: "block",
+            // Le fond blanc des photos se fond dans le cadre crème
+            mixBlendMode: "multiply",
+            transform: zoom ? "scale(1.06)" : "scale(1)",
+            transition: "transform .5s cubic-bezier(.2,.7,.2,1)",
+          }}
+        />
+      </div>
+    );
   if (p.imgUrl && !err)
     return (
       <div
@@ -2365,7 +2416,7 @@ function PCard({ p, onView, onAdd }) {
           opacity: soldOut ? 0.8 : 1,
         }}
       >
-        <ProdImg p={p} size="card" />
+        <ProdImg p={p} size="card" zoom={hov} />
         {!soldOut && p.price > settings.installMinPrice && (
           <div style={{ position: "absolute", bottom: 8, left: 8 }}>
             <span
@@ -2540,6 +2591,14 @@ function ProductPage({ product: p, onBack }) {
   const { settings, addToCart, session, canInstall } = useStore();
   const isMobile = useIsMobile();
   const [qty, setQty] = useState(1);
+  const [imgHov, setImgHov] = useState(false);
+  const [lightbox, setLightbox] = useState(false);
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e) => e.key === "Escape" && setLightbox(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
   const elig = canInstall(p);
   const soldOut = p.stock === 0;
   const waHref = soldOut
@@ -2568,16 +2627,95 @@ function ProductPage({ product: p, onBack }) {
         }}
       >
         <div
+          onClick={() => p.imgUrl && setLightbox(true)}
+          onMouseEnter={() => setImgHov(true)}
+          onMouseLeave={() => setImgHov(false)}
           style={{
-            background: "#FFFFFF",
-            borderRadius: 12,
+            position: "relative",
+            borderRadius: isMobile ? 0 : 14,
             overflow: "hidden",
-            border: "1px solid var(--border)",
+            border: isMobile ? "none" : "1px solid var(--border)",
             alignSelf: "start",
+            // Sur mobile, la photo va d'un bord à l'autre de l'écran
+            margin: isMobile ? "0 -16px" : 0,
+            cursor: p.imgUrl ? "zoom-in" : "default",
           }}
         >
-          <ProdImg p={p} size="card" />
+          <ProdImg p={p} size="card" zoom={imgHov} />
+          {p.imgUrl && (
+            <span
+              style={{
+                position: "absolute",
+                right: 12,
+                bottom: 12,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 11px",
+                borderRadius: 20,
+                background: "rgba(255,255,255,.85)",
+                backdropFilter: "blur(6px)",
+                fontSize: 11,
+                color: "var(--text)",
+              }}
+            >
+              <Maximize2 size={12} />
+              Agrandir
+            </span>
+          )}
         </div>
+        {lightbox && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Photo de ${p.name}`}
+            onClick={() => setLightbox(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 1000,
+              background: "rgba(20,16,12,.92)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+              cursor: "zoom-out",
+              animation: "lbIn .2s ease-out",
+            }}
+          >
+            <img
+              src={p.imgUrl}
+              alt={p.name}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+                borderRadius: 8,
+              }}
+            />
+            <button
+              aria-label="Fermer"
+              onClick={() => setLightbox(false)}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                border: "none",
+                background: "rgba(255,255,255,.15)",
+                color: "#fff",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        )}
         <div>
           <div
             style={{
