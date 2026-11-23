@@ -1177,27 +1177,33 @@ const ProdImg = ({ p, size = "md" }) => {
     sm: { h: 120, fs: 38 },
     md: { h: 170, fs: 52 },
     lg: { h: 300, fs: 100 },
+    card: { ratio: "1 / 1", fs: 52 },
   }[size];
+  // Format carré pour les cartes : le flacon reste entier (contain)
+  const box = sz.ratio
+    ? { aspectRatio: sz.ratio, width: "100%" }
+    : { height: sz.h };
   if (p.imgUrl && !err)
     return (
       <div
         style={{
-          height: sz.h,
+          ...box,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          background: "#F8F4EE",
+          background: "#FFFFFF",
         }}
       >
         <img
           src={p.imgUrl}
           alt={p.name}
+          loading="lazy"
           onError={() => setErr(true)}
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: sz.ratio || size === "lg" ? "contain" : "cover",
             display: "block",
             transition: "transform .4s",
           }}
@@ -1209,7 +1215,7 @@ const ProdImg = ({ p, size = "md" }) => {
   return (
     <div
       style={{
-        height: sz.h,
+        ...box,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -1231,6 +1237,8 @@ const ProdImg = ({ p, size = "md" }) => {
 // ── Bouton WhatsApp flottant ───────────────────────────────────────────────────
 function FloatingWhatsApp() {
   const { settings } = useStore();
+  const isMobile = useIsMobile();
+  const d = isMobile ? 48 : 56;
   const waHref = waLink(
     settings.whatsapp,
     "Bonjour M. Ulrich ! Je souhaite passer une commande de parfums. Pouvez-vous m'aider ?",
@@ -1243,11 +1251,11 @@ function FloatingWhatsApp() {
       title="Commander via WhatsApp"
       style={{
         position: "fixed",
-        bottom: 24,
-        right: 24,
+        bottom: isMobile ? "calc(14px + env(safe-area-inset-bottom))" : 24,
+        right: isMobile ? 12 : 24,
         zIndex: 998,
-        width: 58,
-        height: 58,
+        width: d,
+        height: d,
         borderRadius: "50%",
         background: "#25D366",
         display: "flex",
@@ -1261,7 +1269,7 @@ function FloatingWhatsApp() {
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
     >
-      <MessageCircle size={26} color="#fff" />
+      <MessageCircle size={isMobile ? 22 : 26} color="#fff" />
     </a>
   );
 }
@@ -1716,66 +1724,6 @@ function ShopPage({ onView, onConseils }) {
   );
   return (
     <div>
-      {/* ── Bannière "Site en construction" ── */}
-      <div
-        style={{
-          background: "linear-gradient(90deg,#9A6E2E,#C9A84C,#9A6E2E)",
-          padding: "0",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 16,
-            padding: "11px 24px",
-            flexWrap: "wrap",
-            textAlign: "center",
-          }}
-        >
-          <span style={{ fontSize: 14 }}>🚧</span>
-          <p
-            style={{
-              fontSize: 12,
-              color: "#FFF",
-              letterSpacing: "0.04em",
-              lineHeight: 1.6,
-            }}
-          >
-            <strong>Notre boutique est en cours de construction</strong> — mais
-            vous pouvez déjà commander dès maintenant !
-          </p>
-          <a
-            href={waLink(
-              settings.whatsapp,
-              "Bonjour M. Ulrich ! Je souhaite passer une commande de parfums. Pouvez-vous m'aider ?",
-            )}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              background: "#25D366",
-              color: "#FFF",
-              padding: "6px 14px",
-              borderRadius: 20,
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-            }}
-          >
-            <MessageCircle size={13} />
-            Commander via WhatsApp
-          </a>
-        </div>
-      </div>
-
       {/* Hero */}
       <div
         style={{
@@ -2141,8 +2089,10 @@ function ShopPage({ onView, onConseils }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))",
-            gap: 14,
+            gridTemplateColumns: isMobile
+              ? "repeat(2,minmax(0,1fr))"
+              : "repeat(auto-fill,minmax(240px,1fr))",
+            gap: isMobile ? 10 : 16,
           }}
         >
           {visible.map((p) => (
@@ -2197,8 +2147,10 @@ function ShopPage({ onView, onConseils }) {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))",
-                gap: 14,
+                gridTemplateColumns: isMobile
+                  ? "repeat(2,minmax(0,1fr))"
+                  : "repeat(auto-fill,minmax(240px,1fr))",
+                gap: isMobile ? 10 : 16,
               }}
             >
               {pastStock.map((p) => (
@@ -2270,9 +2222,12 @@ function ShopPage({ onView, onConseils }) {
   );
 }
 
-function PCard({ p, onView, onAdd, featured }) {
+function PCard({ p, onView, onAdd }) {
   const { settings } = useStore();
+  const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
+  const soldOut = p.stock === 0;
+  const stockColor = soldOut ? "var(--muted)" : "#c25400";
   return (
     <div
       onMouseEnter={() => setHov(true)}
@@ -2280,184 +2235,187 @@ function PCard({ p, onView, onAdd, featured }) {
       style={{
         background: "var(--surf)",
         border: `1px solid ${hov ? "rgba(154,110,46,.3)" : "var(--border)"}`,
-        borderRadius: 8,
+        borderRadius: 10,
         overflow: "hidden",
-        transition: "all .25s",
-        transform: hov ? "translateY(-5px)" : "none",
-        boxShadow: hov ? "0 16px 38px rgba(42,33,24,.12)" : "none",
-        cursor: "pointer",
+        transition: "transform .25s ease-out, box-shadow .25s ease-out, border-color .25s",
+        transform: hov ? "translateY(-4px)" : "none",
+        boxShadow: hov ? "0 14px 32px rgba(42,33,24,.10)" : "none",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div
         onClick={onView}
         style={{
-          padding: featured ? "20px 20px 0" : "12px 12px 0",
-          textAlign: "center",
-          background: "linear-gradient(145deg,#F3EEE7,#FDFAF5)",
           position: "relative",
+          cursor: "pointer",
+          opacity: soldOut ? 0.8 : 1,
         }}
       >
-        <ProdImg p={p} size={featured ? "md" : "sm"} />
-        {featured && (
-          <div style={{ position: "absolute", top: 10, right: 10 }}>
-            <Badge c="gold">Coup de cœur</Badge>
-          </div>
-        )}
-        {p.stock <= 3 && p.stock > 0 && (
-          <div style={{ position: "absolute", top: 10, left: 10 }}>
-            <Badge c="orange">Stock limité</Badge>
-          </div>
-        )}
-        {p.price > settings.installMinPrice && (
-          <div style={{ position: "absolute", bottom: 8, right: 8 }}>
+        <ProdImg p={p} size="card" />
+        {!soldOut && p.price > settings.installMinPrice && (
+          <div style={{ position: "absolute", bottom: 8, left: 8 }}>
             <span
               style={{
-                background: "rgba(21,101,192,.85)",
+                background: "rgba(21,101,192,.9)",
                 color: "#fff",
-                border: "1px solid rgba(255,255,255,.25)",
-                padding: "3px 10px",
+                padding: "3px 9px",
                 borderRadius: 20,
                 fontSize: 10,
                 fontWeight: 600,
-                letterSpacing: "0.05em",
-                display: "inline-block",
+                letterSpacing: "0.04em",
                 whiteSpace: "nowrap",
-                backdropFilter: "blur(4px)",
               }}
             >
-              Paiement en tranches
+              {isMobile ? "En tranches" : "Paiement en tranches"}
             </span>
           </div>
         )}
       </div>
-      <div style={{ padding: "14px 18px 18px" }}>
+      <div
+        style={{
+          padding: isMobile ? "12px 12px 14px" : "16px 18px 18px",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
         <div
           style={{
-            fontSize: 9,
-            letterSpacing: "0.16em",
+            fontSize: 10,
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "var(--muted)",
-            marginBottom: 3,
+            marginBottom: 4,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
+          title={`${p.brand} · ${p.size}`}
         >
-          {p.cat} · {p.size}
+          {p.brand} · {p.size}
         </div>
         <div
           onClick={onView}
           style={{
             fontFamily: "var(--fd)",
-            fontSize: 17,
+            fontSize: isMobile ? 17 : 19,
             fontWeight: 500,
-            marginBottom: 3,
             lineHeight: 1.2,
+            marginBottom: isMobile ? 8 : 10,
+            cursor: "pointer",
           }}
         >
           {p.name}
         </div>
-        <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 10 }}>
-          {p.brand}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            gap: 4,
-            flexWrap: "wrap",
-            marginBottom: 13,
-          }}
-        >
-          {p.notes.map((n) => (
-            <span
-              key={n}
+        {!isMobile && (
+          <div
+            style={{
+              display: "flex",
+              gap: 5,
+              flexWrap: "wrap",
+              marginBottom: 14,
+            }}
+          >
+            {p.notes.map((n) => (
+              <span
+                key={n}
+                style={{
+                  fontSize: 11,
+                  padding: "2px 9px",
+                  background: "var(--surf2)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 20,
+                  color: "var(--muted)",
+                }}
+              >
+                {n}
+              </span>
+            ))}
+          </div>
+        )}
+        <div style={{ marginTop: "auto" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              justifyContent: "space-between",
+              alignItems: isMobile ? "stretch" : "center",
+              gap: isMobile ? 8 : 10,
+              marginBottom: 10,
+            }}
+          >
+            <div
               style={{
-                fontSize: 9,
-                padding: "2px 7px",
-                background: "var(--surf2)",
-                border: "1px solid var(--border)",
-                borderRadius: 20,
-                color: "var(--muted)",
+                fontFamily: "var(--fd)",
+                fontSize: isMobile ? 18 : 20,
+                color: "var(--gold)",
+                fontWeight: 500,
+                fontVariantNumeric: "tabular-nums",
               }}
             >
-              {n}
-            </span>
-          ))}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--fd)",
-              fontSize: 18,
-              color: "var(--gold)",
-              fontWeight: 500,
-            }}
-          >
-            {fmt(p.price)}
-            {p.stock === 0 && <IndicativePrice />}
-          </div>
-          {p.stock === 0 ? (
-            <a
-              href={requestLink(settings.whatsapp, p)}
-              target="_blank"
-              rel="noreferrer"
-              style={{ textDecoration: "none" }}
-            >
-              <Btn sz="sm" v="wa">
-                <MessageCircle size={12} />
-                Demander
+              {fmt(p.price)}
+              {soldOut && <IndicativePrice />}
+            </div>
+            {soldOut ? (
+              <a
+                href={requestLink(settings.whatsapp, p)}
+                target="_blank"
+                rel="noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <Btn
+                  v="ghost"
+                  full={isMobile}
+                  style={{
+                    minHeight: 40,
+                    fontSize: 12,
+                    padding: "8px 14px",
+                    color: "#1a7a3a",
+                    border: "1px solid rgba(37,211,102,.6)",
+                  }}
+                >
+                  <MessageCircle size={13} />
+                  Demander
+                </Btn>
+              </a>
+            ) : (
+              <Btn
+                onClick={onAdd}
+                full={isMobile}
+                style={{ minHeight: 40, fontSize: 12, padding: "8px 16px" }}
+              >
+                <ShoppingBag size={13} />
+                Ajouter
               </Btn>
-            </a>
-          ) : (
-            <Btn sz="sm" onClick={onAdd}>
-              + Panier
-            </Btn>
-          )}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            paddingTop: 8,
-            borderTop: "1px solid var(--border)",
-          }}
-        >
+            )}
+          </div>
           <div
             style={{
-              width: 7,
-              height: 7,
-              borderRadius: "50%",
-              background:
-                p.stock === 0
-                  ? "#c62828"
-                  : p.stock <= 3
-                    ? "#e65100"
-                    : "#3d8c40",
-              flexShrink: 0,
-            }}
-          />
-          <span
-            style={{
-              fontSize: 10,
-              color:
-                p.stock === 0
-                  ? "#c62828"
-                  : p.stock <= 3
-                    ? "#e65100"
-                    : "var(--muted)",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              paddingTop: 9,
+              borderTop: "1px solid var(--border)",
+              fontSize: 11,
+              color: stockColor,
             }}
           >
-            {p.stock === 0
-              ? "Ancien stock · disponible sur demande"
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: soldOut ? "var(--muted)" : "#e65100",
+                flexShrink: 0,
+              }}
+            />
+            {soldOut
+              ? "Sur demande"
               : p.stock <= 3
                 ? `Plus que ${p.stock} en stock`
-                : `${p.stock} unités disponibles`}
-          </span>
+                : `${p.stock} en stock`}
+          </div>
         </div>
       </div>
     </div>
@@ -2498,17 +2456,14 @@ function ProductPage({ product: p, onBack }) {
       >
         <div
           style={{
-            background: "linear-gradient(145deg,#F3EEE7,#FDFAF5)",
+            background: "#FFFFFF",
             borderRadius: 12,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 32,
+            overflow: "hidden",
             border: "1px solid var(--border)",
-            minHeight: 320,
+            alignSelf: "start",
           }}
         >
-          <ProdImg p={p} size="lg" />
+          <ProdImg p={p} size="card" />
         </div>
         <div>
           <div
@@ -2520,7 +2475,7 @@ function ProductPage({ product: p, onBack }) {
               marginBottom: 8,
             }}
           >
-            {p.brand} · {p.cat}
+            {p.brand}
           </div>
           <h1
             style={{
@@ -2536,9 +2491,9 @@ function ProductPage({ product: p, onBack }) {
           <p
             style={{
               color: "var(--muted)",
-              lineHeight: 1.85,
+              lineHeight: 1.75,
               marginBottom: 22,
-              fontSize: 13,
+              fontSize: 15,
             }}
           >
             {p.desc}
@@ -2591,7 +2546,11 @@ function ProductPage({ product: p, onBack }) {
               <div
                 style={{
                   fontSize: 13,
-                  color: p.stock <= 3 ? "#e65100" : "var(--text)",
+                  color: soldOut
+                    ? "var(--muted)"
+                    : p.stock <= 3
+                      ? "#c25400"
+                      : "var(--text)",
                 }}
               >
                 {soldOut
