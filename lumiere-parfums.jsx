@@ -246,7 +246,8 @@ const SEED_PRODUCTS = [
     notes: ["Agrumes", "Notes marines", "Bois"],
     size: "100 ml",
     img: "🔷",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437152/Blue_Zenith_zsjpl1.jpg",
     featured: true,
   },
   {
@@ -330,7 +331,8 @@ const SEED_PRODUCTS = [
     notes: ["Gardénia", "Fleurs blanches", "Musc"],
     size: "150 ml",
     img: "🤍",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/Gardenia_iwar7n.jpg",
     featured: false,
   },
   {
@@ -344,7 +346,8 @@ const SEED_PRODUCTS = [
     notes: ["Rose", "Fruits rouges", "Vanille"],
     size: "80 ml",
     img: "❤️",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/true_amore_gbgy9c.jpg",
     featured: false,
   },
   {
@@ -358,7 +361,8 @@ const SEED_PRODUCTS = [
     notes: ["Cuir", "Fleurs", "Ambre"],
     size: "80 ml",
     img: "👜",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/vibrant_leather_for_her_raigex.jpg",
     featured: false,
   },
   {
@@ -372,7 +376,8 @@ const SEED_PRODUCTS = [
     notes: ["Pamplemousse", "Vétiver", "Bois"],
     size: "100 ml",
     img: "🍊",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437111/vetiver_pamplemousse_q5lsap.jpg",
     featured: false,
   },
   {
@@ -386,7 +391,8 @@ const SEED_PRODUCTS = [
     notes: ["Vanille", "Encens", "Bois"],
     size: "100 ml",
     img: "🕯️",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437109/Dolce_nostalgia_vanilla_intense_gcsnsa.jpg",
     featured: false,
   },
   {
@@ -400,7 +406,8 @@ const SEED_PRODUCTS = [
     notes: ["Litchi", "Citronnelle", "Musc"],
     size: "100 ml",
     img: "🍈",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437111/Lychee_Lemongrass_jmzmnj.jpg",
     featured: false,
   },
   // ── Anciens stocks (épuisés) — affichés « Disponibles sur demande » ──
@@ -415,7 +422,8 @@ const SEED_PRODUCTS = [
     notes: ["Bergamote", "Pomme verte", "Fève tonka"],
     size: "120 ml",
     img: "🌊",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437111/Bogoss_Blue_Temptation_vm1bxp.jpg",
     featured: false,
   },
   {
@@ -429,7 +437,8 @@ const SEED_PRODUCTS = [
     notes: ["Mandarine", "Bergamote", "Ambre"],
     size: "100 ml",
     img: "🌅",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437111/Sunrise_on_the_Red_Sand_Dunes_zma1ru.jpg",
     featured: false,
   },
   {
@@ -485,7 +494,8 @@ const SEED_PRODUCTS = [
     notes: ["Fleurs blanches", "Fruits", "Musc"],
     size: "100 ml",
     img: "🌼",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/Nude_Bouquet_Intense_belzsr.jpg",
     featured: false,
   },
   {
@@ -527,7 +537,8 @@ const SEED_PRODUCTS = [
     notes: ["Fruits", "Fleurs", "Musc"],
     size: "80 ml",
     img: "☀️",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/Golden_Decade_Summer_qjhsf4.jpg",
     featured: false,
   },
   {
@@ -541,7 +552,8 @@ const SEED_PRODUCTS = [
     notes: ["Mûre", "Oud", "Bois"],
     size: "100 ml",
     img: "🫐",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437110/Blackberry_Oud_kjdgsm.jpg",
     featured: false,
   },
   {
@@ -555,7 +567,8 @@ const SEED_PRODUCTS = [
     notes: ["Guimauve", "Vanille", "Musc"],
     size: "100 ml",
     img: "🍬",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437109/Marshmallow_Glow_jgtqrw.avif",
     featured: false,
   },
   {
