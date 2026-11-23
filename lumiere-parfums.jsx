@@ -16,6 +16,7 @@ import {
   Users,
   BarChart2,
   X,
+  ChevronLeft,
   ChevronRight,
   LogIn,
   LogOut,
@@ -1718,6 +1719,34 @@ function ShopPage({ onView, onConseils }) {
   // Produits disponibles en haut, anciens stocks (épuisés) dans une section dédiée
   const visible = matches.filter((p) => p.stock > 0);
   const pastStock = matches.filter((p) => p.stock === 0);
+  // Pagination : chaque section a sa propre page, remise à 1 quand le filtre change
+  const [page, setPage] = useState(1);
+  const [pastPage, setPastPage] = useState(1);
+  useEffect(() => {
+    setPage(1);
+    setPastPage(1);
+  }, [q, cat]);
+  const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const pastPageCount = Math.max(1, Math.ceil(pastStock.length / PAGE_SIZE));
+  const curPage = Math.min(page, pageCount);
+  const curPastPage = Math.min(pastPage, pastPageCount);
+  const visiblePage = visible.slice(
+    (curPage - 1) * PAGE_SIZE,
+    curPage * PAGE_SIZE,
+  );
+  const pastPageItems = pastStock.slice(
+    (curPastPage - 1) * PAGE_SIZE,
+    curPastPage * PAGE_SIZE,
+  );
+  const goTo = (setter, anchor) => (n) => {
+    setter(n);
+    const el = document.getElementById(anchor);
+    if (el)
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - 80,
+        behavior: "smooth",
+      });
+  };
   const waHref = waLink(
     settings.whatsapp,
     `Bonjour, je souhaite des informations sur vos parfums.`,
@@ -2095,7 +2124,7 @@ function ShopPage({ onView, onConseils }) {
             gap: isMobile ? 10 : 16,
           }}
         >
-          {visible.map((p) => (
+          {visiblePage.map((p) => (
             <PCard
               key={p.id}
               p={p}
@@ -2104,6 +2133,12 @@ function ShopPage({ onView, onConseils }) {
             />
           ))}
         </div>
+        <Pagination
+          page={curPage}
+          count={pageCount}
+          total={visible.length}
+          onChange={goTo(setPage, "catalogue")}
+        />
         {visible.length === 0 && (
           <div
             style={{
@@ -2120,7 +2155,7 @@ function ShopPage({ onView, onConseils }) {
           </div>
         )}
         {pastStock.length > 0 && (
-          <div style={{ marginTop: 56 }}>
+          <div id="anciens-stocks" style={{ marginTop: 56 }}>
             <div
               style={{
                 fontFamily: "var(--fd)",
@@ -2153,10 +2188,16 @@ function ShopPage({ onView, onConseils }) {
                 gap: isMobile ? 10 : 16,
               }}
             >
-              {pastStock.map((p) => (
+              {pastPageItems.map((p) => (
                 <PCard key={p.id} p={p} onView={() => onView(p)} />
               ))}
             </div>
+            <Pagination
+              page={curPastPage}
+              count={pastPageCount}
+              total={pastStock.length}
+              onChange={goTo(setPastPage, "anciens-stocks")}
+            />
           </div>
         )}
       </div>
@@ -2219,6 +2260,78 @@ function ShopPage({ onView, onConseils }) {
         </p>
       </footer>
     </div>
+  );
+}
+
+// ── Pagination du catalogue ───────────────────────────────────────────────────
+const PAGE_SIZE = 12;
+
+function Pagination({ page, count, total, onChange }) {
+  if (count <= 1) return null;
+  const from = (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, total);
+  const btn = (active, disabled) => ({
+    minWidth: 40,
+    height: 40,
+    padding: "0 10px",
+    borderRadius: 6,
+    border: `1px solid ${active ? "var(--gold)" : "var(--border)"}`,
+    background: active ? "var(--gold)" : "var(--surf)",
+    color: active ? "#fff" : "var(--text)",
+    fontFamily: "var(--fb)",
+    fontSize: 13,
+    fontWeight: active ? 600 : 400,
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.4 : 1,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "background .15s, border-color .15s",
+  });
+  return (
+    <nav
+      aria-label="Pagination"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 10,
+        marginTop: 28,
+      }}
+    >
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
+        <button
+          aria-label="Page précédente"
+          disabled={page === 1}
+          onClick={() => onChange(page - 1)}
+          style={btn(false, page === 1)}
+        >
+          <ChevronLeft size={16} />
+        </button>
+        {Array.from({ length: count }, (_, i) => i + 1).map((n) => (
+          <button
+            key={n}
+            aria-label={`Page ${n}`}
+            aria-current={n === page ? "page" : undefined}
+            onClick={() => onChange(n)}
+            style={btn(n === page, false)}
+          >
+            {n}
+          </button>
+        ))}
+        <button
+          aria-label="Page suivante"
+          disabled={page === count}
+          onClick={() => onChange(page + 1)}
+          style={btn(false, page === count)}
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+      <div style={{ fontSize: 12, color: "var(--muted)" }}>
+        {from}–{to} sur {total} parfums
+      </div>
+    </nav>
   );
 }
 
