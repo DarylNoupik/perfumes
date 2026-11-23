@@ -34,6 +34,9 @@ import {
   Edit2,
   Save,
   Menu,
+  User,
+  Clock,
+  Lightbulb,
 } from "lucide-react";
 
 // ── Fonts & Global CSS ───────────────────────────────────────────────────────
@@ -1223,6 +1226,7 @@ const ProdImg = ({ p, size = "md", zoom = false }) => {
     md: { h: 170, fs: 52 },
     lg: { h: 300, fs: 100 },
     card: { ratio: "4 / 5", fs: 52 },
+    wide: { ratio: "4 / 3", fs: 52 },
   }[size];
   const box = sz.ratio
     ? { aspectRatio: sz.ratio, width: "100%" }
@@ -3464,8 +3468,8 @@ function ConseilsPage({ onView }) {
         </h1>
         <p
           style={{
-            fontSize: 14,
-            color: "rgba(250,247,242,.55)",
+            fontSize: 15,
+            color: "rgba(250,247,242,.78)",
             maxWidth: 520,
             margin: "0 auto 32px",
             lineHeight: 1.85,
@@ -3501,7 +3505,7 @@ function ConseilsPage({ onView }) {
               <div
                 style={{
                   fontSize: 12,
-                  color: "rgba(250,247,242,.4)",
+                  color: "rgba(250,247,242,.7)",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   marginTop: 3,
@@ -3546,6 +3550,9 @@ function ConseilsPage({ onView }) {
             }}
           >
             {f}
+            <span style={{ opacity: 0.7, marginLeft: 6 }}>
+              {f === "Tous" ? enStock.length : parGenre(f)}
+            </span>
           </button>
         ))}
       </div>
@@ -3563,7 +3570,7 @@ function ConseilsPage({ onView }) {
           gap: isMobile ? 20 : 28,
         }}
       >
-        {visible.map((c, idx) => {
+        {visible.map((c) => {
           const product = products.find((p) => p.id === c.productId);
           if (!product) return null;
           return (
@@ -3573,7 +3580,6 @@ function ConseilsPage({ onView }) {
               product={product}
               onView={onView}
               onAdd={() => addToCart(product)}
-              idx={idx}
             />
           );
         })}
@@ -3589,20 +3595,22 @@ function ConseilsPage({ onView }) {
           textAlign: "center",
         }}
       >
-        <div
+        <h2
           style={{
             fontFamily: "var(--fd)",
             fontSize: isMobile ? 24 : 32,
+            fontWeight: 400,
             marginBottom: 12,
           }}
         >
           Vous ne savez toujours pas lequel choisir ?
-        </div>
+        </h2>
         <p
           style={{
-            fontSize: 13,
+            fontSize: 15,
             color: "var(--muted)",
-            marginBottom: 24,
+            maxWidth: 460,
+            margin: "0 auto 24px",
             lineHeight: 1.75,
           }}
         >
@@ -3618,69 +3626,75 @@ function ConseilsPage({ onView }) {
   );
 }
 
-function ConseilCard({ c, product, onView, onAdd, idx }) {
+function ConseilCard({ c, product, onView, onAdd }) {
   const { settings } = useStore();
   const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
+  const [revealRef, revealStyle] = useReveal();
   const soldOut = product.stock === 0;
-  const waHref = soldOut
-    ? requestLink(settings.whatsapp, product)
-    : waLink(
-        settings.whatsapp,
-        `Bonjour M. Ulrich ! Je suis intéressé(e) par le parfum ${product.name} (${fmt(product.price)}). Pouvez-vous m'aider ?`,
-      );
+  const open = () => onView(product);
   return (
-    <div
+    <article
+      ref={revealRef}
+      className="pcard"
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
+        ...revealStyle,
         background: "var(--surf)",
         border: `1px solid ${hov ? "rgba(154,110,46,.3)" : "var(--border)"}`,
         borderRadius: 12,
         overflow: "hidden",
-        transition: "all .3s",
-        transform: hov ? "translateY(-6px)" : "none",
-        boxShadow: hov ? "0 20px 48px rgba(42,33,24,.13)" : "none",
-        animation: `cardReveal .4s ease ${idx * 0.06}s both`,
+        transition: "transform .25s ease-out, box-shadow .25s ease-out, border-color .25s",
+        transform: hov ? "translateY(-4px)" : "none",
+        boxShadow: hov ? "0 14px 32px rgba(42,33,24,.10)" : "none",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* Image */}
+      {/* Photo entière (format paysage) + badges lisibles sur n'importe quel fond */}
       <div
-        onClick={() => onView(product)}
-        style={{
-          cursor: "pointer",
-          position: "relative",
-          background: "linear-gradient(145deg,#F3EEE7,#FDFAF5)",
-        }}
+        onClick={open}
+        aria-hidden="true"
+        style={{ cursor: "pointer", position: "relative", opacity: soldOut ? 0.8 : 1 }}
       >
-        <ProdImg p={product} size="md" />
-        {/* Badge tendance */}
-        <div style={{ position: "absolute", top: 12, left: 12 }}>
+        <ProdImg p={product} size="wide" zoom={hov} />
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            left: 12,
+            right: 12,
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 8,
+            pointerEvents: "none",
+          }}
+        >
           <span
             style={{
-              background: c.trendBg,
+              background: "rgba(255,255,255,.94)",
               color: c.trendColor,
-              border: `1px solid ${c.trendColor}33`,
-              padding: "3px 10px",
+              boxShadow: "0 1px 4px rgba(42,33,24,.12)",
+              padding: "4px 11px",
               borderRadius: 20,
               fontSize: 12,
               fontWeight: 600,
-              letterSpacing: "0.08em",
+              letterSpacing: "0.04em",
+              whiteSpace: "nowrap",
             }}
           >
             {c.tendance}
           </span>
-        </div>
-        {/* Badge genre */}
-        <div style={{ position: "absolute", top: 12, right: 12 }}>
           <span
             style={{
-              background: "rgba(42,33,24,.6)",
+              background: "rgba(42,33,24,.78)",
               color: "#FAF7F2",
-              padding: "3px 10px",
+              padding: "4px 11px",
               borderRadius: 20,
               fontSize: 12,
-              letterSpacing: "0.08em",
+              letterSpacing: "0.04em",
+              whiteSpace: "nowrap",
             }}
           >
             {c.genre}
@@ -3688,179 +3702,193 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
         </div>
       </div>
 
-      {/* Contenu */}
-      <div style={{ padding: isMobile ? "18px 16px 20px" : "20px 22px 24px" }}>
-        {/* Famille + nom */}
+      <div
+        style={{
+          padding: isMobile ? "18px 16px 20px" : "20px 22px 22px",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
         <div
           style={{
             fontSize: 12,
-            letterSpacing: "0.18em",
+            letterSpacing: "0.16em",
             textTransform: "uppercase",
             color: "var(--muted)",
             marginBottom: 4,
           }}
         >
-          {c.famille} · {product.brand}
+          {c.famille} · {product.brand} · {product.size}
         </div>
-        <h3
-          onClick={() => onView(product)}
+        {/* Clic souris sur le nom ; au clavier, le bouton « Voir la fiche » suffit */}
+        <h2
+          onClick={open}
           style={{
             fontFamily: "var(--fd)",
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: 400,
-            marginBottom: 6,
+            lineHeight: 1.15,
+            marginBottom: 4,
             cursor: "pointer",
-            lineHeight: 1.1,
           }}
         >
           {product.name}
-        </h3>
-
-        {/* Accroche */}
+        </h2>
         <p
           style={{
             fontFamily: "var(--fd)",
-            fontSize: 14,
+            fontSize: 16,
             fontStyle: "italic",
             color: "var(--gold-text)",
-            marginBottom: 12,
-            lineHeight: 1.5,
+            marginBottom: 14,
+            lineHeight: 1.4,
           }}
         >
-          "{c.accroche}"
+          {c.accroche}
         </p>
 
-        {/* Occasions */}
-        <div
-          style={{
-            display: "flex",
-            gap: 5,
-            flexWrap: "wrap",
-            marginBottom: 14,
-          }}
-        >
-          {c.occasions.map((o) => (
-            <span
-              key={o}
-              style={{
-                fontSize: 12,
-                padding: "3px 9px",
-                background: "var(--surf2)",
-                border: "1px solid var(--border)",
-                borderRadius: 20,
-                color: "var(--muted)",
-                letterSpacing: "0.06em",
-              }}
-            >
-              {o}
-            </span>
-          ))}
-        </div>
-
-        {/* Séparateur */}
-        <div
-          style={{
-            height: 1,
-            background: "linear-gradient(to right,var(--border),transparent)",
-            marginBottom: 14,
-          }}
-        />
-
-        {/* Tendance marché */}
         <p
           style={{
-            fontSize: 12,
-            color: "var(--muted)",
-            lineHeight: 1.75,
-            marginBottom: 12,
+            fontSize: 14,
+            color: "var(--text)",
+            lineHeight: 1.7,
+            marginBottom: 16,
           }}
         >
           {c.description}
         </p>
 
-        {/* L'envie */}
-        <div
+        {/* Repères : pour qui, quand, comment */}
+        <dl
           style={{
-            background: "rgba(154,110,46,.04)",
-            border: "1px solid rgba(154,110,46,.18)",
-            borderRadius: 7,
-            padding: "12px 14px",
-            marginBottom: 14,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "var(--gold-text)",
-              marginBottom: 5,
-            }}
-          >
-            L'envie
-          </div>
-          <p style={{ fontSize: 12, color: "var(--text)", lineHeight: 1.75 }}>
-            {c.envie}
-          </p>
-        </div>
-
-        {/* Conseil pratique */}
-        <div
-          style={{
-            display: "flex",
-            gap: 8,
-            alignItems: "flex-start",
+            display: "grid",
+            gap: 12,
+            padding: "14px 0 0",
+            borderTop: "1px solid var(--border)",
             marginBottom: 18,
           }}
         >
-          <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
-          <p
-            style={{
-              fontSize: 12,
-              color: "var(--muted)",
-              lineHeight: 1.65,
-              fontStyle: "italic",
-            }}
-          >
-            {c.conseil}
-          </p>
-        </div>
+          {[
+            { Icon: User, t: "Pour qui", body: c.envie },
+            {
+              Icon: Clock,
+              t: "Quand",
+              body: (
+                <span style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+                  {c.occasions.map((o) => (
+                    <span
+                      key={o}
+                      style={{
+                        fontSize: 12,
+                        padding: "3px 10px",
+                        background: "var(--surf2)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 20,
+                        color: "var(--muted)",
+                      }}
+                    >
+                      {o}
+                    </span>
+                  ))}
+                </span>
+              ),
+            },
+            { Icon: Lightbulb, t: "Comment le porter", body: c.conseil },
+          ].map(({ Icon, t, body }) => (
+            <div key={t} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <Icon
+                size={16}
+                color="var(--gold)"
+                aria-hidden="true"
+                style={{ flexShrink: 0, marginTop: 2 }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <dt
+                  style={{
+                    fontSize: 12,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "var(--gold-text)",
+                    marginBottom: 2,
+                  }}
+                >
+                  {t}
+                </dt>
+                <dd style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.6 }}>
+                  {body}
+                </dd>
+              </div>
+            </div>
+          ))}
+        </dl>
 
-        {/* Prix + CTA */}
+        {/* Prix + actions, toujours en bas de la carte */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingTop: 14,
+            marginTop: "auto",
+            paddingTop: 16,
             borderTop: "1px solid var(--border)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
             flexWrap: "wrap",
-            gap: 10,
+            gap: 12,
           }}
         >
-          <div
-            style={{
-              fontFamily: "var(--fd)",
-              fontSize: 22,
-              color: "var(--gold)",
-              fontWeight: 500,
-            }}
-          >
-            {fmt(product.price)}
-            {soldOut && <IndicativePrice />}
+          <div>
+            <div
+              style={{
+                fontFamily: "var(--fd)",
+                fontSize: 24,
+                color: "var(--gold-text)",
+                fontWeight: 500,
+                lineHeight: 1,
+              }}
+            >
+              {fmt(product.price)}
+            </div>
+            {soldOut ? (
+              <IndicativePrice />
+            ) : (
+              <div style={{ fontSize: 12, color: "#c25400", marginTop: 4 }}>
+                Plus que {product.stock} en stock
+              </div>
+            )}
           </div>
-          <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-            <Btn sz="sm" onClick={() => onView(product)}>
-              Voir le parfum
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Btn
+              v="ghost"
+              onClick={open}
+              ariaLabel={`Voir la fiche de ${product.name}`}
+              style={{ minHeight: 44 }}
+            >
+              Voir la fiche
             </Btn>
-            <Btn href={waHref} sz="sm" v="wa">
-                <MessageCircle size={12} />
-                {soldOut ? "Demander ce parfum" : "Commander"}
+            {soldOut ? (
+              <Btn
+                href={requestLink(settings.whatsapp, product)}
+                v="wa"
+                ariaLabel={`Demander ${product.name} sur WhatsApp`}
+                style={{ minHeight: 44 }}
+              >
+                <MessageCircle size={14} aria-hidden="true" />
+                Demander
               </Btn>
+            ) : (
+              <Btn
+                onClick={onAdd}
+                ariaLabel={`Ajouter ${product.name} au panier`}
+                style={{ minHeight: 44 }}
+              >
+                <ShoppingBag size={14} aria-hidden="true" />
+                Ajouter
+              </Btn>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
