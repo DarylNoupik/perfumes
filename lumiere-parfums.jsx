@@ -91,7 +91,7 @@ const SEED_SETTINGS = {
   tagline: "Maison de Parfums",
   heroTitle: "L'Art du Parfum Rare",
   heroSubtitle:
-    "Des fragrances d'exception, sélectionnées pour les connaisseurs. Livraison partout à Douala.",
+    "Une petite sélection de parfums, livrés partout à Douala.",
   heroLabel: "Collection Exclusive ·",
   city: "Douala, Cameroun",
   whatsapp: "237656493976",
@@ -99,7 +99,7 @@ const SEED_SETTINGS = {
   installMinOrders: 3,
   installMinPrice: 50000,
   promoEndDate: "2026-04-05T23:59:59",
-  promoLabel: "Offre de lancement — Livraison offerte sur votre 1ère commande",
+  promoLabel: "Offre de lancement : livraison offerte sur votre première commande",
 };
 
 const SEED_PRODUCTS = [
@@ -1835,6 +1835,10 @@ function CartButton({ count, onClick }) {
 function ShopPage({ onView, onConseils }) {
   const { settings, products, addToCart } = useStore();
   const isMobile = useIsMobile();
+  // Nombre de parfums en stock qui ont une fiche conseil
+  const guideCount = CONSEILS_DATA.filter(
+    (c) => (products.find((p) => p.id === c.productId)?.stock || 0) > 0,
+  ).length;
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tous");
   const cats = ["Tous", ...new Set(products.map((p) => p.cat).filter(Boolean))];
@@ -1983,7 +1987,7 @@ function ShopPage({ onView, onConseils }) {
                   ?.scrollIntoView({ behavior: "smooth" })
               }
             >
-              Explorer la Collection
+              Découvrir les parfums
             </Btn>
             <Btn href={waHref} sz="lg" v="wa">
                 <MessageCircle size={15} />
@@ -2080,7 +2084,7 @@ function ShopPage({ onView, onConseils }) {
                 marginBottom: 10,
               }}
             >
-              Nouveau · Guide exclusif
+              Conseils parfums
             </div>
             <h2
               style={{
@@ -2106,12 +2110,12 @@ function ShopPage({ onView, onConseils }) {
                 marginBottom: isMobile ? 18 : 0,
               }}
             >
-              Tendances marché, conseils de port, profils olfactifs — notre
-              guide vous aide à trouver{" "}
+              Pour chaque parfum en stock : à qui il va, à quel moment le
+              porter et comment l'appliquer. De quoi trouver{" "}
               <strong style={{ color: "rgba(250,247,242,.8)" }}>
-                le parfum fait pour vous
-              </strong>{" "}
-              en moins de 2 minutes.
+                celui qui vous correspond
+              </strong>
+              .
             </p>
           </div>
 
@@ -2152,7 +2156,7 @@ function ShopPage({ onView, onConseils }) {
                 letterSpacing: "0.06em",
               }}
             >
-              Gratuit · 10 parfums analysés
+              {guideCount} parfums en stock passés en revue
             </span>
           </div>
         </div>
@@ -2176,7 +2180,7 @@ function ShopPage({ onView, onConseils }) {
           <h2
             style={{ fontFamily: "var(--fd)", fontSize: 30, fontWeight: 400 }}
           >
-            Catalogue Complet
+            Catalogue complet
           </h2>
           <div
             style={{
@@ -3099,7 +3103,7 @@ function ProductPage({ product: p, onBack }) {
                   lineHeight: 1.65,
                 }}
               >
-                Client fidèle — {settings.installMinOrders} versements de{" "}
+                Client fidèle : {settings.installMinOrders} versements de{" "}
                 {fmt(Math.ceil(p.price / settings.installMinOrders))}.
               </p>
             </Panel>
@@ -3191,180 +3195,212 @@ function ProductPage({ product: p, onBack }) {
 // ── Conseils & Tendances ──────────────────────────────────────────────────────
 const CONSEILS_DATA = [
   {
-    productId: 1,
-    famille: "Floral Violet",
-    tendance: "Tendance 2026",
-    trendBg: "rgba(155,89,182,.12)",
-    trendColor: "#7d3c98",
-    genre: "Féminin",
-    occasions: ["Bureau", "Brunch", "Week-end"],
-    accroche: "La douceur qui reste gravée",
-    description:
-      "En 2026, les floraux violets s'imposent comme la signature olfactive des femmes modernes. Frais le matin, légèrement chauds en soirée, ils traversent les humeurs et les saisons.",
-    envie:
-      "Pour la femme qui veut être remarquée sans en avoir l'air. Violet Blossom crée une présence douce et inoubliable — le genre de parfum dont on vous demandera le nom à voix basse.",
-    conseil:
-      "Vaporisez sur le poignet et la nuque après la douche. La chaleur de la peau révèle toute sa profondeur.",
-  },
-  {
     productId: 2,
-    famille: "Fruité Boisé",
-    tendance: "Séduction audacieuse",
+    famille: "Fruité boisé",
+    tendance: "Pour le soir",
     trendBg: "rgba(192,57,43,.12)",
     trendColor: "#922b21",
     genre: "Féminin",
     occasions: ["Soirée", "Rendez-vous", "Sortie"],
-    accroche: "La tentation à laquelle on ne résiste pas",
+    accroche: "Fruité, avec du caractère",
     description:
-      "Red Temptation de Zara s'impose comme l'un des parfums féminins les plus remarqués de 2025-2026. Son caractère fruité et boisé crée un contraste saisissant — doux en surface, magnétique en profondeur.",
+      "Les fruits rouges ouvrent, puis le bois et le musc prennent le relais. Il se remarque, et il est plus à l'aise en soirée qu'au bureau.",
     envie:
-      "Pour la femme qui assume sa séduction sans effort. Les fruits rouges éclatants et le fond boisé musqué composent un sillage à la fois lumineux et enveloppant — irrésistible.",
+      "Pour celle qui aime qu'on lui demande ce qu'elle porte.",
     conseil:
-      "Vaporisez sur les poignets et le décolleté avant de sortir. Le sillage évolue magnifiquement au fil de la soirée.",
+      "Deux pulvérisations suffisent, sur les poignets et le cou, juste avant de sortir.",
   },
   {
-    productId: 3,
-    famille: "Floral Oriental",
-    tendance: "Signature femme forte",
-    trendBg: "rgba(192,57,43,.1)",
-    trendColor: "#922b21",
-    genre: "Féminin",
-    occasions: ["Soirée", "Dîner chic", "Sortie"],
-    accroche: "Porter Scandal, c'est une déclaration",
-    description:
-      "Jean Paul Gaultier a créé un chef-d'œuvre de la provocation chic. Scandal domine les classements des parfums féminins les plus désirés depuis 2017 — il ne se démode pas, il s'intensifie.",
-    envie:
-      "Pour la femme qui entre dans une pièce et ne passe pas inaperçue. Le miel doré et le gardénia blanc composent un sillage opulent, sensuel, qui reste en mémoire bien après votre départ.",
-    conseil:
-      "Un seul vaporisateur suffit — Scandal est très concentré. Poignets et décolleté pour un effet maximal.",
-  },
-  {
-    productId: 4,
-    famille: "Aromatique Boisé",
-    tendance: "Classique intemporel",
-    trendBg: "rgba(44,62,80,.1)",
-    trendColor: "#1a252f",
+    productId: 11,
+    famille: "Frais marin",
+    tendance: "Frais du quotidien",
+    trendBg: "rgba(41,128,185,.12)",
+    trendColor: "#1f618d",
     genre: "Masculin",
-    occasions: ["Bureau", "Mariage", "Formel"],
-    accroche: "L'élégance qui n'a pas besoin de crier",
+    occasions: ["Bureau", "Quotidien", "Sport"],
+    accroche: "Un frais facile pour tous les jours",
     description:
-      "Legend de Mont Blanc est l'un des masculins les plus vendus dans sa catégorie depuis plus de 10 ans. Une valeur sûre qui transcende les tendances parce qu'elle incarne quelque chose de plus profond : le raffinement discret.",
+      "Agrumes et notes marines en tête, bois en fond. Quand il fait chaud et humide comme à Douala, un parfum frais reste le choix le plus simple.",
     envie:
-      "Pour l'homme accompli qui n'a pas besoin d'en faire trop. La bergamote lumineuse et le cèdre racé composent la signature olfactive de quelqu'un à qui on fait confiance instinctivement.",
+      "Pour l'homme qui veut sentir bon du matin au soir sans y penser.",
     conseil:
-      "Idéal pour le bureau et les cérémonies. Appliquez le matin — il tiendra toute la journée avec classe.",
+      "Mettez-le après la douche du matin. Par forte chaleur, une petite remise en fin de journée ne fait pas de mal.",
   },
   {
-    productId: 7,
-    famille: "Ambre Épicé",
-    tendance: "N°1 des jeunes hommes",
-    trendBg: "rgba(243,156,18,.12)",
-    trendColor: "#9a7d0a",
-    genre: "Masculin",
-    occasions: ["Soirée", "Sport", "Séduction"],
-    accroche: "La victoire a une odeur",
-    description:
-      "Invictus Victory Elixir est le parfum masculin le plus porté par les hommes de 20-35 ans. Son ambre chaud et ses épices intenses en font une référence incontournable dans les tendances mondiales de 2025-2026.",
-    envie:
-      "Charismatique, puissant, magnétique. Ce parfum ne se porte pas — il se vit. Pour les hommes qui ont des objectifs et les atteignent, qui savent que chaque détail compte.",
-    conseil:
-      "Son sillage intense est fait pour les occasions qui comptent. Une application sur le torse suffit — il fera le reste.",
-  },
-  {
-    productId: 5,
-    famille: "Oriental Épicé",
-    tendance: "Masculin séduction",
-    trendBg: "rgba(142,68,173,.1)",
-    trendColor: "#6c3483",
-    genre: "Masculin",
-    occasions: ["Soirée", "Rendez-vous", "Week-end"],
-    accroche: "Intense. Magnétique. Inoubliable.",
-    description:
-      "La version la plus puissante du mythique Le Mâle. En 2026, les masculins orientaux épicés connaissent une renaissance portée par une génération d'hommes qui assument pleinement leur sensualité.",
-    envie:
-      "Il laisse une trace longtemps après votre départ. La cardamome épicée et la lavande profonde créent un contraste saisissant — viril et raffiné à la fois. Un paradoxe élégant.",
-    conseil:
-      "La cardamome se réveille à la chaleur du corps — portez-le proche de la peau, sur le torse et les poignets.",
-  },
-  {
-    productId: 8,
-    famille: "Boisé Fougère",
-    tendance: "Authenticité & liberté",
-    trendBg: "rgba(39,174,96,.1)",
-    trendColor: "#1e8449",
-    genre: "Masculin",
-    occasions: ["Quotidien", "Casual", "Plein air"],
-    accroche: "Pas pour tout le monde",
-    description:
-      "Only The Brave de Diesel incarne l'esprit de liberté qui séduit les 25-35 ans en quête d'authenticité. Les boisés fougères sont en forte progression sur le marché africain et mondial.",
-    envie:
-      "Pour l'homme qui fait ses propres règles. Cèdre bleu et vétiver composent un parfum qui respire l'espace et la liberté — sans chichis, sans compromis, sans chercher à plaire à tout le monde.",
-    conseil:
-      "Très polyvalent pour le quotidien. Son caractère boisé frais le rend adapté autant au travail qu'aux sorties décontractées.",
-  },
-  {
-    productId: 6,
-    famille: "Cuir Boisé",
-    tendance: "Tendance urbaine 2026",
-    trendBg: "rgba(127,85,57,.12)",
-    trendColor: "#6e2c00",
+    productId: 12,
+    famille: "Thé boisé",
+    tendance: "Parfum mixte",
+    trendBg: "rgba(127,140,141,.14)",
+    trendColor: "#4d5656",
     genre: "Mixte",
-    occasions: ["Soirée", "Urban", "Statement"],
-    accroche: "Le courage d'être différent",
+    occasions: ["Bureau", "Rendez-vous", "Week-end"],
+    accroche: "Le parfum que vous pouvez partager",
     description:
-      "Le cuir fait un retour remarqué dans les tendances mondiales. En 2025-2026, les parfums cuirés séduisent une clientèle urbaine et affirmée qui refuse les fragrances trop communes.",
+      "Bergamote, thé noir et bois : un parfum sobre, ni sucré ni floral, qui va aussi bien à un homme qu'à une femme. Les parfums mixtes sont de plus en plus demandés.",
     envie:
-      "Pour ceux qui veulent une présence olfactive forte et distincte. Zara Leather est audacieux — ni timide ni agressif, juste singulier. Le parfum de ceux qui n'ont pas besoin d'être comme les autres.",
+      "Pour ceux qui trouvent la plupart des parfums trop sucrés ou trop marqués homme ou femme.",
     conseil:
-      "Laissez-le se développer sur la peau 15 minutes avant de sortir. Le cuir évolue magnifiquement à la chaleur corporelle.",
+      "Le thé noir se sent mieux sur une peau hydratée : appliquez-le après votre crème.",
   },
   {
-    productId: 9,
-    famille: "Oriental Doré",
-    tendance: "Tendance luxe accessible",
-    trendBg: "rgba(212,172,13,.12)",
-    trendColor: "#9a7d0a",
-    genre: "Mixte",
-    occasions: ["Soirée", "Mariage", "Occasions spéciales"],
-    accroche: "L'or liquide en flacon",
+    productId: 13,
+    famille: "Frais fruité",
+    tendance: "Frais et doux",
+    trendBg: "rgba(52,152,219,.12)",
+    trendColor: "#21618c",
+    genre: "Masculin",
+    occasions: ["Quotidien", "Sortie", "Week-end"],
+    accroche: "Frais au départ, plus doux ensuite",
     description:
-      "Golden Decade incarne la montée en puissance des orientaux dorés dans les tendances 2025-2026. Les fragrances ambrées et boisées à caractère luxueux séduisent une clientèle qui veut l'élégance sans sacrifier l'accessibilité.",
+      "La bergamote et la pomme verte donnent une ouverture vive, puis la fève tonka arrondit le fond.",
     envie:
-      "Pour ceux qui veulent marquer les esprits lors des grandes occasions. Golden Decade dégage une chaleur dorée et enveloppante qui évoque le luxe, la fête et les souvenirs qui durent.",
+      "Pour celui qui aime les parfums frais mais les trouve parfois un peu froids.",
     conseil:
-      "Idéal pour les mariages et soirées. Appliquez sur le cou et les poignets — la chaleur du corps révèle progressivement ses notes ambrées et boisées tout au long de la nuit.",
+      "Le flacon fait 120 ml. Il y en a assez pour le porter tous les jours pendant longtemps.",
   },
   {
-    productId: 10,
-    famille: "Floral Poudré",
-    tendance: "Féminité intemporelle",
+    productId: 14,
+    famille: "Floral léger",
+    tendance: "Pour la journée",
     trendBg: "rgba(218,112,214,.12)",
     trendColor: "#8e44ad",
     genre: "Féminin",
     occasions: ["Bureau", "Brunch", "Quotidien"],
-    accroche: "La fleur rare du quotidien",
+    accroche: "Discret et propre",
     description:
-      "L'orchidée s'impose comme l'une des fleurs phares de la parfumerie féminine contemporaine. Rare, sophistiquée et délicate, elle symbolise en 2026 une féminité assumée et raffinée.",
+      "Fleurs blanches et fruits sur un fond de musc. C'est un parfum léger, qui convient bien au bureau.",
     envie:
-      "Pour la femme douce et élégante qui aime les fragrances florales sans excès. Orchid enveloppe avec grâce — une présence olfactive subtile qui accompagne sans envahir.",
+      "Pour celle qui veut sentir bon sans imposer son parfum à tout le bureau.",
     conseil:
-      "Parfait pour le bureau ou les sorties diurnes. Vaporisez sur les poignets et la nuque le matin — sa douceur poudrée tiendra tout au long de la journée.",
+      "Comme il est léger, vous pouvez le remettre dans la journée sans risque d'en faire trop.",
   },
   {
-    productId: 11,
-    famille: "Floral Rose",
-    tendance: "Romance moderne",
+    productId: 15,
+    famille: "Gourmand floral",
+    tendance: "Gourmand",
+    trendBg: "rgba(230,126,34,.12)",
+    trendColor: "#a04000",
+    genre: "Féminin",
+    occasions: ["Sortie", "Week-end", "Rendez-vous"],
+    accroche: "Fruité, fleuri, avec de la vanille",
+    description:
+      "Fruits et fleurs en tête, vanille en fond. Les parfums gourmands, ceux qui rappellent un peu le dessert, font toujours partie des plus demandés.",
+    envie:
+      "Pour celle qui aime les parfums sucrés et chaleureux.",
+    conseil:
+      "La vanille tient bien sur les tissus : une pulvérisation sur le col ou l'écharpe fait durer le parfum.",
+  },
+  {
+    productId: 16,
+    famille: "Boisé épicé",
+    tendance: "Pour le soir",
+    trendBg: "rgba(110,44,0,.12)",
+    trendColor: "#6e2c00",
+    genre: "Masculin",
+    occasions: ["Soirée", "Rendez-vous", "Dîner"],
+    accroche: "Chaud et épicé, à garder pour le soir",
+    description:
+      "Épices, bois et ambre : un parfum chaud qui prend de la place. En pleine journée à Douala, il peut vite devenir lourd. Le soir, il est à sa place.",
+    envie:
+      "Pour l'homme qui veut qu'on se souvienne de son passage.",
+    conseil:
+      "Une ou deux pulvérisations sur le torse suffisent. Avec ce genre de parfum, mieux vaut en mettre peu.",
+  },
+  {
+    productId: 17,
+    famille: "Floral blanc",
+    tendance: "Fleurs blanches",
+    trendBg: "rgba(212,172,13,.12)",
+    trendColor: "#7d6608",
+    genre: "Féminin",
+    occasions: ["Mariage", "Cérémonie", "Quotidien"],
+    accroche: "Le gardénia, adouci par le musc",
+    description:
+      "Un floral blanc construit autour du gardénia. Le musc arrondit la fleur pour qu'elle ne devienne pas entêtante.",
+    envie:
+      "Pour celle qui aime les fleurs blanches et les parfums élégants.",
+    conseil:
+      "Le flacon fait 150 ml : vous pouvez le porter tous les jours sans compter.",
+  },
+  {
+    productId: 18,
+    famille: "Floral fruité",
+    tendance: "Romantique",
     trendBg: "rgba(231,76,60,.1)",
     trendColor: "#c0392b",
     genre: "Féminin",
-    occasions: ["Rendez-vous", "Week-end", "Casual chic"],
-    accroche: "La rose réinventée",
+    occasions: ["Rendez-vous", "Soirée", "Cadeau"],
+    accroche: "Rose, fruits rouges et vanille",
     description:
-      "Wonder Rose renouvelle l'amour éternel de la parfumerie pour la reine des fleurs. En 2026, les roses modernes abandonnent le côté poussiéreux pour une interprétation lumineuse et dynamique qui séduit toutes les générations.",
+      "La rose et les fruits rouges ouvrent, la vanille adoucit le fond. C'est un parfum romantique, plutôt sucré.",
     envie:
-      "Pour la femme romantique et moderne à la fois. Wonder Rose est une rose vibrante et lumineuse qui sent la fraîcheur, la féminité et la confiance — le genre de parfum qui met de bonne humeur.",
+      "Pour un rendez-vous, ou pour l'offrir.",
     conseil:
-      "Idéal pour les rendez-vous et sorties du week-end. Appliquez sur le poignet et derrière les oreilles — la rose se révèle pleinement à la chaleur de la peau.",
+      "Appliquez-le sur les poignets et derrière les oreilles, là où la peau est la plus chaude.",
+  },
+  {
+    productId: 19,
+    famille: "Cuir floral",
+    tendance: "Cuir au féminin",
+    trendBg: "rgba(127,85,57,.12)",
+    trendColor: "#6e2c00",
+    genre: "Féminin",
+    occasions: ["Soirée", "Sortie", "Bureau"],
+    accroche: "Un cuir adouci par les fleurs",
+    description:
+      "Le cuir est surtout utilisé dans les parfums pour homme. Ici, des notes florales et un fond ambré le rendent plus doux.",
+    envie:
+      "Pour celle qui trouve les floraux classiques un peu trop sages.",
+    conseil:
+      "Attendez quelques minutes avant de vous faire un avis : le cuir s'adoucit sur la peau.",
+  },
+  {
+    productId: 20,
+    famille: "Hespéridé boisé",
+    tendance: "Frais",
+    trendBg: "rgba(39,174,96,.1)",
+    trendColor: "#1e8449",
+    genre: "Mixte",
+    occasions: ["Quotidien", "Bureau", "Sport"],
+    accroche: "Pamplemousse en tête, vétiver en fond",
+    description:
+      "Le pamplemousse se sent tout de suite, puis le vétiver et le bois prennent le relais. Il convient bien aux journées chaudes.",
+    envie:
+      "Pour un couple qui veut un parfum frais à partager.",
+    conseil:
+      "Les agrumes s'évaporent vite. Gardez le flacon à portée pour une deuxième application l'après-midi.",
+  },
+  {
+    productId: 21,
+    famille: "Ambré vanillé",
+    tendance: "Vanille et encens",
+    trendBg: "rgba(155,89,182,.12)",
+    trendColor: "#6c3483",
+    genre: "Mixte",
+    occasions: ["Soirée", "Week-end", "Saison des pluies"],
+    accroche: "Chaud et réconfortant",
+    description:
+      "La vanille apporte la douceur, l'encens un côté plus sombre et boisé. On retrouve de plus en plus cet accord chez les parfumeurs.",
+    envie:
+      "Pour les soirées plus fraîches, ou pour ceux qui aiment les parfums enveloppants.",
+    conseil:
+      "Il est assez présent : une pulvérisation dans le cou suffit.",
+  },
+  {
+    productId: 22,
+    famille: "Fruité frais",
+    tendance: "Frais",
+    trendBg: "rgba(46,204,113,.12)",
+    trendColor: "#1d8348",
+    genre: "Féminin",
+    occasions: ["Quotidien", "Brunch", "Plage"],
+    accroche: "Litchi et citronnelle",
+    description:
+      "Le litchi apporte un côté fruité et juteux, la citronnelle de la fraîcheur, et le musc garde le tout près de la peau.",
+    envie:
+      "Pour celle qui veut un parfum frais qui ne sente pas le citron classique.",
+    conseil:
+      "Parfait par temps chaud. Vous pouvez en remettre à midi.",
   },
 ];
 
@@ -3374,9 +3410,13 @@ function ConseilsPage({ onView }) {
   const [filtre, setFiltre] = useState("Tous");
   const filtres = ["Tous", "Féminin", "Masculin", "Mixte"];
 
+  // Les parfums en stock passent devant ; les compteurs suivent le stock réel
+  const stockOf = (c) => products.find((p) => p.id === c.productId)?.stock || 0;
+  const enStock = CONSEILS_DATA.filter((c) => stockOf(c) > 0);
+  const parGenre = (g) => enStock.filter((c) => c.genre === g).length;
   const visible = CONSEILS_DATA.filter(
     (c) => filtre === "Tous" || c.genre === filtre,
-  );
+  ).sort((a, b) => (stockOf(b) > 0) - (stockOf(a) > 0));
 
   const waHref = waLink(
     settings.whatsapp,
@@ -3403,7 +3443,7 @@ function ConseilsPage({ onView }) {
             marginBottom: 18,
           }}
         >
-          Maison DIHU · Expertise Parfums
+          DIHU · Conseils parfums
         </div>
         <h1
           style={{
@@ -3431,9 +3471,8 @@ function ConseilsPage({ onView }) {
             lineHeight: 1.85,
           }}
         >
-          Chaque parfum raconte une histoire. Découvrez lequel est fait pour
-          vous, selon votre personnalité, vos occasions et les tendances du
-          marché en 2026.
+          Pour chaque parfum en stock, on vous dit à qui il va, à quel moment
+          le porter et comment l'appliquer.
         </p>
         <div
           style={{
@@ -3444,9 +3483,9 @@ function ConseilsPage({ onView }) {
           }}
         >
           {[
-            { v: "10", l: "Fragrances" },
-            { v: "5", l: "Familles olfactives" },
-            { v: "2026", l: "Sélection" },
+            { v: String(parGenre("Féminin")), l: "Pour elle" },
+            { v: String(parGenre("Masculin")), l: "Pour lui" },
+            { v: String(parGenre("Mixte")), l: "Mixtes" },
           ].map((s) => (
             <div key={s.l} style={{ textAlign: "center" }}>
               <div
@@ -3488,23 +3527,26 @@ function ConseilsPage({ onView }) {
         }}
       >
         {filtres.map((f) => (
-          <span
+          <button
             key={f}
             onClick={() => setFiltre(f)}
+            aria-pressed={filtre === f}
             style={{
-              padding: "6px 18px",
+              fontFamily: "var(--fb)",
+              minHeight: 40,
+              padding: "0 18px",
               borderRadius: 20,
               fontSize: 12,
               cursor: "pointer",
               letterSpacing: "0.08em",
               border: `1px solid ${filtre === f ? "var(--gold)" : "var(--border)"}`,
               background: filtre === f ? "var(--gold-dim)" : "transparent",
-              color: filtre === f ? "var(--gold)" : "var(--muted)",
+              color: filtre === f ? "var(--gold-text)" : "var(--muted)",
               transition: "all .15s",
             }}
           >
             {f}
-          </span>
+          </button>
         ))}
       </div>
 
@@ -3564,8 +3606,8 @@ function ConseilsPage({ onView }) {
             lineHeight: 1.75,
           }}
         >
-          Décrivez votre personnalité, votre occasion ou votre budget — nous
-          vous guidons vers le parfum idéal.
+          Dites-nous pour quelle occasion vous cherchez et quel est votre
+          budget, et on vous oriente vers le bon parfum.
         </p>
         <Btn href={waHref} sz="lg" v="wa">
             <MessageCircle size={15} />
@@ -4030,7 +4072,7 @@ function CheckoutPage({ nav }) {
         Retour
       </Btn>
       <h2 style={{ fontFamily: "var(--fd)", fontSize: 34, marginBottom: 28 }}>
-        Finaliser la Commande
+        Finaliser la commande
       </h2>
       <Panel style={{ marginBottom: 16 }}>
         <div
