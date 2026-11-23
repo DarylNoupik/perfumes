@@ -1489,9 +1489,11 @@ function ShopPage({ onView, onConseils }) {
   const isMobile = useIsMobile();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tous");
-  const cats = ["Tous", ...new Set(products.map((p) => p.cat).filter(Boolean))];
-  const featured = products.filter((p) => p.featured);
-  const visible = products.filter(
+  // Les produits épuisés restent dans l'admin mais sont masqués de la boutique
+  const inStock = products.filter((p) => p.stock > 0);
+  const cats = ["Tous", ...new Set(inStock.map((p) => p.cat).filter(Boolean))];
+  const featured = inStock.filter((p) => p.featured);
+  const visible = inStock.filter(
     (p) =>
       (p.name.toLowerCase().includes(q.toLowerCase()) ||
         p.brand.toLowerCase().includes(q.toLowerCase())) &&
@@ -2800,7 +2802,7 @@ function ConseilsPage({ onView }) {
       >
         {visible.map((c, idx) => {
           const product = products.find((p) => p.id === c.productId);
-          if (!product) return null;
+          if (!product || product.stock === 0) return null;
           return (
             <ConseilCard
               key={c.productId}
