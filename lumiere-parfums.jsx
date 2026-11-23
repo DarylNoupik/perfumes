@@ -486,7 +486,8 @@ const SEED_PRODUCTS = [
     notes: ["Épices", "Bois", "Ambre"],
     size: "80 ml",
     img: "🖤",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795438346/For_Him_cbvhxz.jpg",
     featured: false,
   },
   {
@@ -515,7 +516,8 @@ const SEED_PRODUCTS = [
     notes: ["Rose", "Pivoine", "Musc"],
     size: "150 ml",
     img: "🌹",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795438346/Wonder_Rose_efozns.jpg",
     featured: false,
   },
   {
@@ -588,7 +590,8 @@ const SEED_PRODUCTS = [
     notes: ["Mangue", "Oud", "Bois"],
     size: "100 ml",
     img: "🥭",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795438347/Sera_a_Taormina_Mangue_Oud_ytkmno.jpg",
     featured: false,
   },
 ];
