@@ -47,9 +47,9 @@ const _gs = document.createElement("style");
 _gs.textContent = `
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --gold:#9A6E2E;--gold-l:#C9A84C;--gold-dim:rgba(154,110,46,.08);
+    --gold:#9A6E2E;--gold-text:#86602A;--gold-l:#C9A84C;--gold-dim:rgba(154,110,46,.08);
     --bg:#FAF7F2;--surf:#FFFFFF;--surf2:#F3EEE7;--border:rgba(120,90,50,.12);
-    --text:#2A2118;--muted:rgba(42,33,24,.45);
+    --text:#2A2118;--muted:#736657;
     --fd:'Cormorant Garamond',serif;--fb:'DM Sans',sans-serif;
   }
   body{background:var(--bg);color:var(--text);font-family:var(--fb)}
@@ -58,6 +58,14 @@ _gs.textContent = `
   input,select,textarea{font-family:var(--fb)}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
   @keyframes lbIn{from{opacity:0}to{opacity:1}}
+  @keyframes pageIn{from{opacity:0}to{opacity:1}}
+  @keyframes heroIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes cartBump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-8deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
+  @keyframes countPop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  /* Contour visible pour la navigation au clavier */
+  button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-text)!important;outline-offset:2px}
+  /* Retour visuel au toucher sur mobile */
+  @media (hover:none){.pcard:active{transform:scale(.98)!important;transition:transform .1s!important}}
   .carousel-track{scrollbar-width:none}
   .carousel-track::-webkit-scrollbar{display:none}
   .carousel-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:10px}
@@ -703,6 +711,19 @@ const fmt = (n) => new Intl.NumberFormat("fr-FR").format(n) + " XAF";
 const genId = () => "CMD-" + (1000 + Math.floor(Math.random() * 8999));
 const waLink = (phone, msg = "") =>
   `https://wa.me/${phone.replace(/[\s+]/g, "")}${msg ? "?text=" + encodeURIComponent(msg) : ""}`;
+// Rend un élément non-bouton cliquable au clavier (Entrée / Espace) et annoncé comme bouton
+const a11yClick = (fn, label) => ({
+  role: "button",
+  tabIndex: 0,
+  onClick: fn,
+  onKeyDown: (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fn(e);
+    }
+  },
+  ...(label ? { "aria-label": label } : {}),
+});
 // Lien WhatsApp pour demander un parfum épuisé (ancien stock)
 const requestLink = (phone, p) =>
   waLink(
@@ -714,7 +735,7 @@ const IndicativePrice = () => (
   <div
     style={{
       fontFamily: "var(--fb)",
-      fontSize: 9,
+      fontSize: 12,
       letterSpacing: "0.1em",
       textTransform: "uppercase",
       color: "var(--muted)",
@@ -1017,7 +1038,7 @@ const Badge = ({ children, c = "gold" }) => {
         border: `1px solid ${s.b}`,
         padding: "2px 10px",
         borderRadius: 20,
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 500,
         letterSpacing: "0.06em",
         display: "inline-block",
@@ -1045,10 +1066,17 @@ const Btn = ({
   sz = "md",
   disabled,
   full,
+  href,
+  ariaLabel,
   style: ex = {},
 }) => {
+  // Avec href, le bouton est rendu comme un vrai lien (pas de <button> dans un <a>)
+  const Tag = href ? "a" : "button";
+  const linkProps = href
+    ? { href, target: "_blank", rel: "noreferrer" }
+    : { disabled: disabled || undefined, type: "button" };
   const S = {
-    sm: { padding: "5px 14px", fontSize: 11 },
+    sm: { padding: "5px 14px", fontSize: 12 },
     md: { padding: "9px 20px", fontSize: 12 },
     lg: { padding: "13px 30px", fontSize: 13 },
   }[sz];
@@ -1069,14 +1097,19 @@ const Btn = ({
       color: "#c62828",
       border: "1px solid rgba(229,57,53,.28)",
     },
-    wa: { background: "#25D366", color: "#fff", border: "none" },
+    // Vert foncé : texte blanc lisible (contraste ~5:1)
+    wa: { background: "#1A7F45", color: "#fff", border: "none" },
   }[v || "primary"];
   return (
-    <button
+    <Tag
+      {...linkProps}
+      aria-label={ariaLabel}
       onClick={disabled ? undefined : onClick}
       style={{
         ...S,
         ...V,
+        textDecoration: "none",
+        justifyContent: "center",
         borderRadius: 3,
         fontFamily: "var(--fb)",
         fontWeight: 500,
@@ -1097,7 +1130,7 @@ const Btn = ({
       onMouseLeave={(e) => (e.currentTarget.style.transform = "")}
     >
       {children}
-    </button>
+    </Tag>
   );
 };
 
@@ -1115,7 +1148,7 @@ const Field = ({
       <label
         style={{
           display: "block",
-          fontSize: 10,
+          fontSize: 12,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
           color: "var(--muted)",
@@ -1139,7 +1172,7 @@ const Field = ({
           borderRadius: 3,
           padding: "9px 13px",
           color: "var(--text)",
-          fontSize: 13,
+          fontSize: 16, // 16 px : pas de zoom auto sur iOS
           outline: "none",
           resize: "vertical",
         }}
@@ -1159,7 +1192,7 @@ const Field = ({
           borderRadius: 3,
           padding: "9px 13px",
           color: "var(--text)",
-          fontSize: 13,
+          fontSize: 16, // 16 px : pas de zoom auto sur iOS
           outline: "none",
         }}
         onFocus={(e) => (e.target.style.borderColor = "rgba(154,110,46,.4)")}
@@ -1284,7 +1317,7 @@ const ProdImg = ({ p, size = "md", zoom = false }) => {
     >
       <span style={{ fontSize: sz.fs }}>{p.img}</span>
       <span
-        style={{ fontSize: 9, color: "var(--muted)", letterSpacing: "0.08em" }}
+        style={{ fontSize: 12, color: "var(--muted)", letterSpacing: "0.08em" }}
       >
         Aucune image
       </span>
@@ -1307,6 +1340,7 @@ function FloatingWhatsApp() {
       target="_blank"
       rel="noreferrer"
       title="Commander via WhatsApp"
+      aria-label="Commander via WhatsApp"
       style={{
         position: "fixed",
         bottom: isMobile ? "calc(14px + env(safe-area-inset-bottom))" : 24,
@@ -1320,7 +1354,8 @@ function FloatingWhatsApp() {
         alignItems: "center",
         justifyContent: "center",
         boxShadow: "0 4px 20px rgba(37,211,102,.5)",
-        animation: "waPulse 2.2s infinite",
+        // 3 pulsations à l'arrivée, puis le bouton reste immobile
+        animation: "waPulse 2.2s ease-out 1s 3",
         textDecoration: "none",
         transition: "transform .2s",
       }}
@@ -1350,7 +1385,7 @@ function CountdownBanner() {
       <p
         style={{
           color: "rgba(255,255,255,.75)",
-          fontSize: isMobile ? 11 : 12,
+          fontSize: isMobile ? 12 : 12,
           letterSpacing: "0.08em",
           marginBottom: 12,
           textTransform: "uppercase",
@@ -1408,7 +1443,7 @@ function CountdownBanner() {
               </div>
               <div
                 style={{
-                  fontSize: 8,
+                  fontSize: 12,
                   color: "rgba(255,255,255,.4)",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
@@ -1447,6 +1482,10 @@ function Shell() {
     setSelProduct(p);
     setView("product");
   };
+  // Chaque changement de page repart du haut
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view, selProduct]);
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       {toast && (
@@ -1474,6 +1513,10 @@ function Shell() {
         </div>
       )}
       <AppHeader view={view} nav={nav} />
+      <main
+        key={`${view}-${selProduct?.id ?? ""}`}
+        style={{ animation: "pageIn .2s ease-out" }}
+      >
       {view === "shop" && (
         <ShopPage onView={openProduct} onConseils={() => nav("conseils")} />
       )}
@@ -1488,6 +1531,7 @@ function Shell() {
         (session?.role === "admin" || session?.role === "vendor") && (
           <AdminPage />
         )}
+      </main>
       <FloatingWhatsApp />
     </div>
   );
@@ -1532,8 +1576,8 @@ function AppHeader({ view, nav }) {
       >
         {/* Logo */}
         <div
-          onClick={() => handleNav("shop")}
-          style={{ cursor: "pointer", lineHeight: 1, flexShrink: 0 }}
+          {...a11yClick(() => handleNav("shop"), `${settings.shopName}, retour à l'accueil`)}
+          style={{ cursor: "pointer", lineHeight: 1, flexShrink: 0, borderRadius: 4 }}
         >
           <div
             style={{
@@ -1541,15 +1585,15 @@ function AppHeader({ view, nav }) {
               fontSize: isMobile ? 18 : 21,
               fontWeight: 600,
               letterSpacing: "0.18em",
-              color: "var(--gold)",
+              color: "var(--gold-text)",
             }}
           >
             {settings.shopName}
           </div>
           <div
             style={{
-              fontSize: 8,
-              letterSpacing: "0.35em",
+              fontSize: 12,
+              letterSpacing: isMobile ? "0.16em" : "0.3em",
               textTransform: "uppercase",
               color: "var(--muted)",
               marginTop: 1,
@@ -1563,20 +1607,25 @@ function AppHeader({ view, nav }) {
         {!isMobile && (
           <nav style={{ display: "flex", alignItems: "center", gap: 26 }}>
             {navLinks.map((n) => (
-              <span
+              <button
                 key={n.v}
                 onClick={() => nav(n.v)}
+                aria-current={view === n.v ? "page" : undefined}
                 style={{
-                  fontSize: 11,
+                  background: "none",
+                  border: "none",
+                  padding: "12px 2px",
+                  fontFamily: "var(--fb)",
+                  fontSize: 12,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  color: view === n.v ? "var(--gold)" : "var(--muted)",
+                  color: view === n.v ? "var(--gold-text)" : "var(--muted)",
                   cursor: "pointer",
                   transition: "color .15s",
                 }}
               >
                 {n.l}
-              </span>
+              </button>
             ))}
             {session ? (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1594,82 +1643,29 @@ function AppHeader({ view, nav }) {
                 Connexion
               </Btn>
             )}
-            <div
-              onClick={() => nav("cart")}
-              style={{
-                cursor: "pointer",
-                position: "relative",
-                padding: "7px 13px",
-                background: "var(--surf)",
-                border: "1px solid var(--border)",
-                borderRadius: 4,
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-              }}
-            >
-              <ShoppingBag size={15} color="var(--gold)" />
-              <span style={{ fontSize: 12 }}>{cartCount}</span>
-              {cartCount > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: -3,
-                    right: -3,
-                    width: 7,
-                    height: 7,
-                    background: "var(--gold)",
-                    borderRadius: "50%",
-                  }}
-                />
-              )}
-            </div>
+            <CartButton count={cartCount} onClick={() => nav("cart")} />
           </nav>
         )}
 
         {/* Mobile : panier + hamburger */}
         {isMobile && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div
-              onClick={() => handleNav("cart")}
-              style={{
-                cursor: "pointer",
-                position: "relative",
-                padding: "6px 11px",
-                background: "var(--surf)",
-                border: "1px solid var(--border)",
-                borderRadius: 4,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <ShoppingBag size={15} color="var(--gold)" />
-              <span style={{ fontSize: 12 }}>{cartCount}</span>
-              {cartCount > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: -3,
-                    right: -3,
-                    width: 7,
-                    height: 7,
-                    background: "var(--gold)",
-                    borderRadius: "50%",
-                  }}
-                />
-              )}
-            </div>
+            <CartButton count={cartCount} onClick={() => handleNav("cart")} />
             <button
               onClick={() => setMenuOpen((o) => !o)}
+              aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={menuOpen}
+              aria-controls="menu-mobile"
               style={{
                 background: "none",
                 border: "1px solid var(--border)",
-                borderRadius: 4,
-                padding: "6px 8px",
+                borderRadius: 6,
+                width: 44,
+                height: 44,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 color: "var(--text)",
               }}
             >
@@ -1681,7 +1677,9 @@ function AppHeader({ view, nav }) {
 
       {/* Mobile dropdown menu */}
       {isMobile && menuOpen && (
-        <div
+        <nav
+          id="menu-mobile"
+          aria-label="Menu principal"
           style={{
             borderTop: "1px solid var(--border)",
             background: "rgba(250,247,242,.97)",
@@ -1693,23 +1691,28 @@ function AppHeader({ view, nav }) {
           }}
         >
           {navLinks.map((n) => (
-            <div
+            <button
               key={n.v}
               onClick={() => handleNav(n.v)}
+              aria-current={view === n.v ? "page" : undefined}
               style={{
-                padding: "11px 14px",
+                padding: "13px 14px",
                 borderRadius: 5,
-                fontSize: 13,
+                border: "none",
+                textAlign: "left",
+                width: "100%",
+                fontFamily: "var(--fb)",
+                fontSize: 14,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 background: view === n.v ? "var(--gold-dim)" : "transparent",
-                color: view === n.v ? "var(--gold)" : "var(--text)",
+                color: view === n.v ? "var(--gold-text)" : "var(--text)",
                 cursor: "pointer",
                 fontWeight: view === n.v ? 500 : 400,
               }}
             >
               {n.l}
-            </div>
+            </button>
           ))}
           <div
             style={{
@@ -1754,9 +1757,77 @@ function AppHeader({ view, nav }) {
               </Btn>
             )}
           </div>
-        </div>
+        </nav>
       )}
     </header>
+  );
+}
+
+// Bouton panier : l'icône rebondit et le chiffre s'anime à chaque ajout
+function CartButton({ count, onClick }) {
+  const prev = useRef(count);
+  const [bump, setBump] = useState(0);
+  useEffect(() => {
+    if (count > prev.current) setBump((b) => b + 1);
+    prev.current = count;
+  }, [count]);
+  return (
+    <button
+      onClick={onClick}
+      aria-label={`Panier, ${count} article${count > 1 ? "s" : ""}`}
+      style={{
+        cursor: "pointer",
+        position: "relative",
+        minHeight: 44,
+        minWidth: 44,
+        padding: "0 13px",
+        background: "var(--surf)",
+        border: "1px solid var(--border)",
+        borderRadius: 6,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 7,
+        color: "var(--text)",
+        fontFamily: "var(--fb)",
+      }}
+    >
+      <span
+        key={`i${bump}`}
+        style={{
+          display: "flex",
+          animation: bump ? "cartBump .5s cubic-bezier(.3,1.6,.5,1)" : "none",
+        }}
+      >
+        <ShoppingBag size={16} color="var(--gold)" aria-hidden="true" />
+      </span>
+      <span
+        key={`c${bump}`}
+        aria-hidden="true"
+        style={{
+          fontSize: 13,
+          fontVariantNumeric: "tabular-nums",
+          display: "inline-block",
+          animation: bump ? "countPop .35s ease-out" : "none",
+        }}
+      >
+        {count}
+      </span>
+      {count > 0 && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: -3,
+            right: -3,
+            width: 8,
+            height: 8,
+            background: "var(--gold)",
+            borderRadius: "50%",
+          }}
+        />
+      )}
+    </button>
   );
 }
 
@@ -1857,11 +1928,12 @@ function ShopPage({ onView, onConseils }) {
         >
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.45em",
               textTransform: "uppercase",
-              color: "var(--gold)",
+              color: "var(--gold-text)",
               marginBottom: 22,
+              animation: "heroIn .6s ease-out .05s backwards",
             }}
           >
             {settings.heroLabel}
@@ -1873,6 +1945,7 @@ function ShopPage({ onView, onConseils }) {
               fontWeight: 300,
               lineHeight: 1.06,
               marginBottom: 22,
+              animation: "heroIn .7s ease-out .15s backwards",
             }}
           >
             {settings.heroTitle.split(" ").slice(0, -2).join(" ")}
@@ -1883,11 +1956,12 @@ function ShopPage({ onView, onConseils }) {
           </h1>
           <p
             style={{
-              fontSize: 14,
+              fontSize: 15,
               color: "var(--muted)",
               maxWidth: 420,
               margin: "0 auto 36px",
               lineHeight: 1.8,
+              animation: "heroIn .7s ease-out .3s backwards",
             }}
           >
             {settings.heroSubtitle}
@@ -1897,6 +1971,7 @@ function ShopPage({ onView, onConseils }) {
               display: "flex",
               gap: 10,
               justifyContent: "center",
+              animation: "heroIn .7s ease-out .45s backwards",
               flexWrap: "wrap",
             }}
           >
@@ -1910,17 +1985,10 @@ function ShopPage({ onView, onConseils }) {
             >
               Explorer la Collection
             </Btn>
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noreferrer"
-              style={{ textDecoration: "none" }}
-            >
-              <Btn sz="lg" v="wa">
+            <Btn href={waHref} sz="lg" v="wa">
                 <MessageCircle size={15} />
                 Contactez-nous
               </Btn>
-            </a>
           </div>
         </div>
       </div>
@@ -1947,7 +2015,7 @@ function ShopPage({ onView, onConseils }) {
         }}
       >
         <div
-          onClick={onConseils}
+          {...a11yClick(onConseils, "Voir le guide des conseils parfums")}
           style={{
             cursor: "pointer",
             background:
@@ -2005,7 +2073,7 @@ function ShopPage({ onView, onConseils }) {
           <div style={{ position: "relative", zIndex: 1 }}>
             <div
               style={{
-                fontSize: 9,
+                fontSize: 12,
                 letterSpacing: "0.38em",
                 textTransform: "uppercase",
                 color: "var(--gold-l)",
@@ -2079,8 +2147,8 @@ function ShopPage({ onView, onConseils }) {
             </div>
             <span
               style={{
-                fontSize: 10,
-                color: "rgba(250,247,242,.35)",
+                fontSize: 12,
+                color: "rgba(250,247,242,.72)",
                 letterSpacing: "0.06em",
               }}
             >
@@ -2117,23 +2185,29 @@ function ShopPage({ onView, onConseils }) {
               gap: 8,
               background: "var(--surf)",
               border: "1px solid var(--border)",
-              borderRadius: 4,
-              padding: "7px 13px",
+              borderRadius: 6,
+              padding: "0 14px",
+              minHeight: 44,
+              width: isMobile ? "100%" : "auto",
             }}
           >
-            <Search size={13} color="var(--muted)" />
+            <Search size={15} color="var(--muted)" aria-hidden="true" />
             <input
+              type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Rechercher un parfum..."
+              aria-label="Rechercher un parfum par nom ou par marque"
               style={{
                 background: "none",
                 border: "none",
                 color: "var(--text)",
                 fontFamily: "var(--fb)",
-                fontSize: 12,
+                // 16 px minimum : évite le zoom automatique d'iOS
+                fontSize: 16,
                 outline: "none",
-                width: 180,
+                width: isMobile ? "100%" : 220,
+                minHeight: 40,
               }}
             />
           </div>
@@ -2147,22 +2221,25 @@ function ShopPage({ onView, onConseils }) {
           }}
         >
           {cats.map((c) => (
-            <span
+            <button
               key={c}
               onClick={() => setCat(c)}
+              aria-pressed={cat === c}
               style={{
-                padding: "5px 14px",
+                padding: "0 16px",
+                minHeight: 40,
                 borderRadius: 20,
-                fontSize: 11,
+                fontFamily: "var(--fb)",
+                fontSize: 13,
                 cursor: "pointer",
                 border: `1px solid ${cat === c ? "var(--gold)" : "var(--border)"}`,
                 background: cat === c ? "var(--gold-dim)" : "transparent",
-                color: cat === c ? "var(--gold)" : "var(--muted)",
-                transition: "all .15s",
+                color: cat === c ? "var(--gold-text)" : "var(--muted)",
+                transition: "background .15s, border-color .15s, color .15s",
               }}
             >
               {c}
-            </span>
+            </button>
           ))}
         </div>
         <div
@@ -2206,7 +2283,7 @@ function ShopPage({ onView, onConseils }) {
         )}
         {pastStock.length > 0 && (
           <div id="anciens-stocks" style={{ marginTop: 56 }}>
-            <div
+            <h2
               style={{
                 fontFamily: "var(--fd)",
                 fontSize: isMobile ? 24 : 30,
@@ -2215,7 +2292,7 @@ function ShopPage({ onView, onConseils }) {
               }}
             >
               Déjà vendus · Disponibles sur demande
-            </div>
+            </h2>
             <p
               style={{
                 fontSize: 12,
@@ -2254,7 +2331,7 @@ function ShopPage({ onView, onConseils }) {
           style={{
             fontFamily: "var(--fd)",
             fontSize: 22,
-            color: "var(--gold)",
+            color: "var(--gold-text)",
             letterSpacing: "0.18em",
             marginBottom: 10,
           }}
@@ -2263,7 +2340,7 @@ function ShopPage({ onView, onConseils }) {
         </div>
         <p
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--muted)",
             letterSpacing: "0.06em",
           }}
@@ -2279,9 +2356,11 @@ function ShopPage({ onView, onConseils }) {
             alignItems: "center",
             gap: 5,
             color: "#1a7a3a",
-            fontSize: 12,
+            fontSize: 13,
             textDecoration: "none",
-            margin: "12px 0 0",
+            margin: "4px 0 0",
+            padding: "12px 8px",
+            minHeight: 44,
             fontWeight: 500,
           }}
         >
@@ -2289,7 +2368,7 @@ function ShopPage({ onView, onConseils }) {
         </a>
         <p
           style={{
-            fontSize: 10,
+            fontSize: 12,
             color: "var(--muted)",
             marginTop: 10,
             opacity: 0.5,
@@ -2500,17 +2579,51 @@ function Carousel({ items, perView, gap, resetKey, label, renderItem }) {
   );
 }
 
+// Apparition en fondu quand l'élément entre à l'écran (une seule fois).
+// Le délai suit la position horizontale : les colonnes apparaissent en cascade.
+function useReveal() {
+  const ref = useRef(null);
+  const [delay, setDelay] = useState(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setDelay(0);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        const x = entry.boundingClientRect.left / window.innerWidth;
+        setDelay(Math.max(0, Math.min(1, x)) * 160);
+        io.disconnect();
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const style =
+    delay === null
+      ? { opacity: 0 }
+      : { animation: `cardReveal .45s ease-out ${delay}ms backwards` };
+  return [ref, style];
+}
+
 function PCard({ p, onView, onAdd }) {
   const { settings } = useStore();
   const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
+  const [revealRef, revealStyle] = useReveal();
   const soldOut = p.stock === 0;
   const stockColor = soldOut ? "var(--muted)" : "#c25400";
   return (
     <div
+      ref={revealRef}
+      className="pcard"
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
+        ...revealStyle,
         background: "var(--surf)",
         border: `1px solid ${hov ? "rgba(154,110,46,.3)" : "var(--border)"}`,
         borderRadius: 10,
@@ -2524,6 +2637,7 @@ function PCard({ p, onView, onAdd }) {
     >
       <div
         onClick={onView}
+        aria-hidden="true"
         style={{
           position: "relative",
           cursor: "pointer",
@@ -2539,7 +2653,7 @@ function PCard({ p, onView, onAdd }) {
                 color: "#fff",
                 padding: "3px 9px",
                 borderRadius: 20,
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: 600,
                 letterSpacing: "0.04em",
                 whiteSpace: "nowrap",
@@ -2560,7 +2674,7 @@ function PCard({ p, onView, onAdd }) {
       >
         <div
           style={{
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
             color: "var(--muted)",
@@ -2574,7 +2688,7 @@ function PCard({ p, onView, onAdd }) {
           {p.brand} · {p.size}
         </div>
         <div
-          onClick={onView}
+          {...a11yClick(onView, `Voir la fiche de ${p.name}`)}
           style={{
             fontFamily: "var(--fd)",
             fontSize: isMobile ? 17 : 19,
@@ -2599,7 +2713,7 @@ function PCard({ p, onView, onAdd }) {
               <span
                 key={n}
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   padding: "2px 9px",
                   background: "var(--surf2)",
                   border: "1px solid var(--border)",
@@ -2636,13 +2750,8 @@ function PCard({ p, onView, onAdd }) {
               {soldOut && <IndicativePrice />}
             </div>
             {soldOut ? (
-              <a
-                href={requestLink(settings.whatsapp, p)}
-                target="_blank"
-                rel="noreferrer"
-                style={{ textDecoration: "none" }}
-              >
-                <Btn
+              <Btn href={requestLink(settings.whatsapp, p)}
+                  ariaLabel={`Demander ${p.name} sur WhatsApp`}
                   v="ghost"
                   full={isMobile}
                   style={{
@@ -2656,10 +2765,10 @@ function PCard({ p, onView, onAdd }) {
                   <MessageCircle size={13} />
                   Demander
                 </Btn>
-              </a>
             ) : (
               <Btn
                 onClick={onAdd}
+                ariaLabel={`Ajouter ${p.name} au panier`}
                 full={isMobile}
                 style={{ minHeight: 40, fontSize: 12, padding: "8px 16px" }}
               >
@@ -2675,7 +2784,7 @@ function PCard({ p, onView, onAdd }) {
               gap: 6,
               paddingTop: 9,
               borderTop: "1px solid var(--border)",
-              fontSize: 11,
+              fontSize: 12,
               color: stockColor,
             }}
           >
@@ -2769,7 +2878,7 @@ function ProductPage({ product: p, onBack }) {
                 borderRadius: 20,
                 background: "rgba(255,255,255,.85)",
                 backdropFilter: "blur(6px)",
-                fontSize: 11,
+                fontSize: 12,
                 color: "var(--text)",
               }}
             >
@@ -2833,10 +2942,10 @@ function ProductPage({ product: p, onBack }) {
         <div>
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "var(--gold)",
+              color: "var(--gold-text)",
               marginBottom: 8,
             }}
           >
@@ -2866,7 +2975,7 @@ function ProductPage({ product: p, onBack }) {
           <div style={{ marginBottom: 18 }}>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 12,
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "var(--muted)",
@@ -2884,8 +2993,8 @@ function ProductPage({ product: p, onBack }) {
                     background: "var(--surf2)",
                     border: "1px solid var(--gold)",
                     borderRadius: 20,
-                    color: "var(--gold)",
-                    fontSize: 11,
+                    color: "var(--gold-text)",
+                    fontSize: 12,
                   }}
                 >
                   {n}
@@ -2896,7 +3005,7 @@ function ProductPage({ product: p, onBack }) {
           <div style={{ display: "flex", gap: 24, marginBottom: 20 }}>
             <div>
               <div
-                style={{ fontSize: 10, color: "var(--muted)", marginBottom: 2 }}
+                style={{ fontSize: 12, color: "var(--muted)", marginBottom: 2 }}
               >
                 Contenance
               </div>
@@ -2904,7 +3013,7 @@ function ProductPage({ product: p, onBack }) {
             </div>
             <div>
               <div
-                style={{ fontSize: 10, color: "var(--muted)", marginBottom: 2 }}
+                style={{ fontSize: 12, color: "var(--muted)", marginBottom: 2 }}
               >
                 {soldOut ? "Disponibilité" : "En stock"}
               </div>
@@ -2949,17 +3058,10 @@ function ProductPage({ product: p, onBack }) {
                 vous dirons s'il peut être recommandé, à quel prix et dans quel
                 délai.
               </p>
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noreferrer"
-                style={{ textDecoration: "none" }}
-              >
-                <Btn v="wa" sz="lg">
+              <Btn href={waHref} v="wa" sz="lg">
                   <MessageCircle size={15} />
                   Demander ce parfum
                 </Btn>
-              </a>
             </>
           ) : (
           <>
@@ -2982,7 +3084,7 @@ function ProductPage({ product: p, onBack }) {
                 <Layers size={15} color="var(--gold)" />
                 <span
                   style={{
-                    color: "var(--gold)",
+                    color: "var(--gold-text)",
                     fontSize: 13,
                     fontWeight: 500,
                   }}
@@ -2992,7 +3094,7 @@ function ProductPage({ product: p, onBack }) {
               </div>
               <p
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: "var(--muted)",
                   lineHeight: 1.65,
                 }}
@@ -3010,7 +3112,7 @@ function ProductPage({ product: p, onBack }) {
                 borderColor: "rgba(33,150,243,.45)",
               }}
             >
-              <p style={{ fontSize: 11, color: "#1565c0", lineHeight: 1.65 }}>
+              <p style={{ fontSize: 12, color: "#1565c0", lineHeight: 1.65 }}>
                 💡 Connectez-vous pour vérifier votre éligibilité au paiement en
                 tranches.
               </p>
@@ -3074,17 +3176,10 @@ function ProductPage({ product: p, onBack }) {
               Ajouter au panier
             </Btn>
           </div>
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noreferrer"
-            style={{ textDecoration: "none" }}
-          >
-            <Btn v="wa" sz="sm">
+          <Btn href={waHref} v="wa" sz="sm">
               <MessageCircle size={13} />
               Commander par WhatsApp
             </Btn>
-          </a>
           </>
           )}
         </div>
@@ -3301,7 +3396,7 @@ function ConseilsPage({ onView }) {
       >
         <div
           style={{
-            fontSize: 9,
+            fontSize: 12,
             letterSpacing: "0.45em",
             textTransform: "uppercase",
             color: "var(--gold-l)",
@@ -3366,7 +3461,7 @@ function ConseilsPage({ onView }) {
               </div>
               <div
                 style={{
-                  fontSize: 9,
+                  fontSize: 12,
                   color: "rgba(250,247,242,.4)",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
@@ -3399,7 +3494,7 @@ function ConseilsPage({ onView }) {
             style={{
               padding: "6px 18px",
               borderRadius: 20,
-              fontSize: 11,
+              fontSize: 12,
               cursor: "pointer",
               letterSpacing: "0.08em",
               border: `1px solid ${filtre === f ? "var(--gold)" : "var(--border)"}`,
@@ -3472,17 +3567,10 @@ function ConseilsPage({ onView }) {
           Décrivez votre personnalité, votre occasion ou votre budget — nous
           vous guidons vers le parfum idéal.
         </p>
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noreferrer"
-          style={{ textDecoration: "none" }}
-        >
-          <Btn sz="lg" v="wa">
+        <Btn href={waHref} sz="lg" v="wa">
             <MessageCircle size={15} />
             Demandez conseil sur WhatsApp
           </Btn>
-        </a>
       </div>
     </div>
   );
@@ -3533,7 +3621,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
               border: `1px solid ${c.trendColor}33`,
               padding: "3px 10px",
               borderRadius: 20,
-              fontSize: 9,
+              fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.08em",
             }}
@@ -3549,7 +3637,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
               color: "#FAF7F2",
               padding: "3px 10px",
               borderRadius: 20,
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.08em",
             }}
           >
@@ -3563,7 +3651,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
         {/* Famille + nom */}
         <div
           style={{
-            fontSize: 9,
+            fontSize: 12,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             color: "var(--muted)",
@@ -3592,7 +3680,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
             fontFamily: "var(--fd)",
             fontSize: 14,
             fontStyle: "italic",
-            color: "var(--gold)",
+            color: "var(--gold-text)",
             marginBottom: 12,
             lineHeight: 1.5,
           }}
@@ -3613,7 +3701,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
             <span
               key={o}
               style={{
-                fontSize: 9,
+                fontSize: 12,
                 padding: "3px 9px",
                 background: "var(--surf2)",
                 border: "1px solid var(--border)",
@@ -3660,10 +3748,10 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
         >
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "var(--gold)",
+              color: "var(--gold-text)",
               marginBottom: 5,
             }}
           >
@@ -3686,7 +3774,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
           <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
           <p
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--muted)",
               lineHeight: 1.65,
               fontStyle: "italic",
@@ -3723,17 +3811,10 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
             <Btn sz="sm" onClick={() => onView(product)}>
               Voir le parfum
             </Btn>
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noreferrer"
-              style={{ textDecoration: "none" }}
-            >
-              <Btn sz="sm" v="wa">
+            <Btn href={waHref} sz="sm" v="wa">
                 <MessageCircle size={12} />
                 {soldOut ? "Demander ce parfum" : "Commander"}
               </Btn>
-            </a>
           </div>
         </div>
       </div>
@@ -3830,7 +3911,7 @@ function CartPage({ nav }) {
               >
                 {i.name}
               </div>
-              <div style={{ fontSize: 11, color: "var(--muted)" }}>
+              <div style={{ fontSize: 12, color: "var(--muted)" }}>
                 {i.brand} · {i.size} · Qté : {i.qty}
               </div>
               {isMobile && (
@@ -3838,7 +3919,7 @@ function CartPage({ nav }) {
                   style={{
                     fontFamily: "var(--fd)",
                     fontSize: 15,
-                    color: "var(--gold)",
+                    color: "var(--gold-text)",
                     marginTop: 3,
                   }}
                 >
@@ -3887,7 +3968,7 @@ function CartPage({ nav }) {
         >
           <div>
             <div
-              style={{ fontSize: 11, color: "var(--muted)", marginBottom: 3 }}
+              style={{ fontSize: 12, color: "var(--muted)", marginBottom: 3 }}
             >
               Total
             </div>
@@ -3954,7 +4035,7 @@ function CheckoutPage({ nav }) {
       <Panel style={{ marginBottom: 16 }}>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--muted)",
@@ -3996,7 +4077,7 @@ function CheckoutPage({ nav }) {
       <Panel style={{ marginBottom: 16 }}>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--muted)",
@@ -4030,7 +4111,7 @@ function CheckoutPage({ nav }) {
       <Panel style={{ marginBottom: 16 }}>
         <div
           style={{
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--muted)",
@@ -4084,11 +4165,11 @@ function CheckoutPage({ nav }) {
             <Layers size={16} color="var(--gold)" />
             <div style={{ flex: 1 }}>
               <div
-                style={{ fontSize: 12, fontWeight: 500, color: "var(--gold)" }}
+                style={{ fontSize: 12, fontWeight: 500, color: "var(--gold-text)" }}
               >
                 Paiement en {settings.installMinOrders} fois
               </div>
-              <div style={{ fontSize: 10, color: "var(--muted)" }}>
+              <div style={{ fontSize: 12, color: "var(--muted)" }}>
                 Client fidèle
               </div>
             </div>
@@ -4264,7 +4345,7 @@ function AccountPage({ nav }) {
               padding: "11px 13px",
               background: "var(--surf2)",
               borderRadius: 5,
-              fontSize: 10,
+              fontSize: 12,
               color: "var(--muted)",
               lineHeight: 1.9,
             }}
@@ -4299,10 +4380,10 @@ function AccountPage({ nav }) {
         <div>
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "var(--gold)",
+              color: "var(--gold-text)",
               marginBottom: 5,
             }}
           >
@@ -4313,7 +4394,7 @@ function AccountPage({ nav }) {
           >
             Bonjour, {session.name.split(" ")[0]}
           </h2>
-          <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 3 }}>
             {session.role === "client"
               ? "Client"
               : session.role === "vendor"
@@ -4337,11 +4418,11 @@ function AccountPage({ nav }) {
               style={{ margin: "0 auto 5px", display: "block" }}
             />
             <div
-              style={{ fontSize: 11, color: "var(--gold)", fontWeight: 500 }}
+              style={{ fontSize: 12, color: "var(--gold-text)", fontWeight: 500 }}
             >
               Paiement en tranches
             </div>
-            <div style={{ fontSize: 9, color: "var(--muted)" }}>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>
               Client fidèle
             </div>
           </Panel>
@@ -4399,7 +4480,7 @@ function AccountPage({ nav }) {
               >
                 {s.v}
               </div>
-              <div style={{ fontSize: 10, color: "var(--muted)" }}>{s.l}</div>
+              <div style={{ fontSize: 12, color: "var(--muted)" }}>{s.l}</div>
             </Panel>
           ))}
         </div>
@@ -4445,7 +4526,7 @@ function AccountPage({ nav }) {
                   </div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       color: "var(--muted)",
                       marginBottom: 5,
                     }}
@@ -4461,7 +4542,7 @@ function AccountPage({ nav }) {
                     <span
                       key={i.productId}
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: "var(--muted)",
                         marginRight: 10,
                       }}
@@ -4507,7 +4588,7 @@ function AccountPage({ nav }) {
             }}
           >
             <div
-              style={{ fontSize: 11, color: "var(--muted)", lineHeight: 1.75 }}
+              style={{ fontSize: 12, color: "var(--muted)", lineHeight: 1.75 }}
             >
               💡{" "}
               <strong style={{ color: "var(--gold)" }}>
