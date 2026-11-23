@@ -456,7 +456,8 @@ const SEED_PRODUCTS = [
     notes: ["Agrumes", "Ambre", "Bois"],
     size: "100 ml",
     img: "🏜️",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795437111/Sunrise_on_the_Red_Sand_Dunes_zma1ru.jpg",
     featured: false,
   },
   {
