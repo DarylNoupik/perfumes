@@ -6,6 +6,7 @@
 import {
   useState,
   useEffect,
+  useRef,
   useContext,
   createContext,
   useCallback,
@@ -57,6 +58,9 @@ _gs.textContent = `
   input,select,textarea{font-family:var(--fb)}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
   @keyframes lbIn{from{opacity:0}to{opacity:1}}
+  .carousel-track{scrollbar-width:none}
+  .carousel-track::-webkit-scrollbar{display:none}
+  .carousel-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:10px}
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   }
@@ -1772,24 +1776,17 @@ function ShopPage({ onView, onConseils }) {
   // Produits disponibles en haut, anciens stocks (épuisés) dans une section dédiée
   const visible = matches.filter((p) => p.stock > 0);
   const pastStock = matches.filter((p) => p.stock === 0);
-  // Pagination : chaque section a sa propre page, remise à 1 quand le filtre change
+  // Pagination des produits disponibles, remise à 1 quand le filtre change
+  // (les anciens stocks sont présentés dans un carrousel)
   const [page, setPage] = useState(1);
-  const [pastPage, setPastPage] = useState(1);
   useEffect(() => {
     setPage(1);
-    setPastPage(1);
   }, [q, cat]);
   const pageCount = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
-  const pastPageCount = Math.max(1, Math.ceil(pastStock.length / PAGE_SIZE));
   const curPage = Math.min(page, pageCount);
-  const curPastPage = Math.min(pastPage, pastPageCount);
   const visiblePage = visible.slice(
     (curPage - 1) * PAGE_SIZE,
     curPage * PAGE_SIZE,
-  );
-  const pastPageItems = pastStock.slice(
-    (curPastPage - 1) * PAGE_SIZE,
-    curPastPage * PAGE_SIZE,
   );
   const goTo = (setter, anchor) => (n) => {
     setter(n);
@@ -2232,24 +2229,13 @@ function ShopPage({ onView, onConseils }) {
               d'eux vous intéresse, demandez-le sur WhatsApp et nous vous dirons
               s'il peut être recommandé. Les prix sont indicatifs.
             </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile
-                  ? "repeat(2,minmax(0,1fr))"
-                  : "repeat(auto-fill,minmax(240px,1fr))",
-                gap: isMobile ? 10 : 16,
-              }}
-            >
-              {pastPageItems.map((p) => (
-                <PCard key={p.id} p={p} onView={() => onView(p)} />
-              ))}
-            </div>
-            <Pagination
-              page={curPastPage}
-              count={pastPageCount}
-              total={pastStock.length}
-              onChange={goTo(setPastPage, "anciens-stocks")}
+            <Carousel
+              items={pastStock}
+              perView={isMobile ? 2 : 4}
+              gap={isMobile ? 10 : 16}
+              resetKey={`${q}|${cat}`}
+              label="Parfums déjà vendus"
+              renderItem={(p) => <PCard p={p} onView={() => onView(p)} />}
             />
           </div>
         )}
@@ -2385,6 +2371,132 @@ function Pagination({ page, count, total, onChange }) {
         {from}–{to} sur {total} parfums
       </div>
     </nav>
+  );
+}
+
+// ── Carrousel horizontal (anciens stocks) ─────────────────────────────────────
+function Carousel({ items, perView, gap, resetKey, label, renderItem }) {
+  const trackRef = useRef(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+  const [first, setFirst] = useState(0);
+
+  const update = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const step = el.clientWidth / perView;
+    setFirst(Math.round(el.scrollLeft / step));
+    setAtStart(el.scrollLeft <= 4);
+    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
+  }, [perView]);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollTo({ left: 0 });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [update, resetKey, items.length]);
+
+  const slide = (dir) => {
+    const el = trackRef.current;
+    if (el) el.scrollBy({ left: dir * (el.clientWidth + gap), behavior: "smooth" });
+  };
+
+  const arrow = (disabled) => ({
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    border: "1px solid var(--border)",
+    background: "var(--surf)",
+    color: "var(--text)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: disabled ? "default" : "pointer",
+    opacity: disabled ? 0.35 : 1,
+    transition: "opacity .2s, border-color .2s",
+    flexShrink: 0,
+  });
+
+  const last = Math.min(first + perView, items.length);
+
+  return (
+    <section aria-label={label} aria-roledescription="carrousel">
+      <div
+        ref={trackRef}
+        className="carousel-track"
+        tabIndex={0}
+        style={{
+          display: "flex",
+          gap,
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          scrollBehavior: "smooth",
+          WebkitOverflowScrolling: "touch",
+          padding: "6px 0",
+        }}
+      >
+        {items.map((it) => (
+          <div
+            key={it.id}
+            style={{
+              flex: `0 0 calc((100% - ${gap * (perView - 1)}px) / ${perView})`,
+              scrollSnapAlign: "start",
+              display: "flex",
+              minWidth: 0,
+            }}
+          >
+            <div style={{ width: "100%", minWidth: 0 }}>{renderItem(it)}</div>
+          </div>
+        ))}
+      </div>
+      {items.length > perView && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+            marginTop: 18,
+          }}
+        >
+          <button
+            aria-label="Parfums précédents"
+            disabled={atStart}
+            onClick={() => slide(-1)}
+            style={arrow(atStart)}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <span
+            aria-live="polite"
+            style={{
+              fontSize: 12,
+              color: "var(--muted)",
+              minWidth: 110,
+              textAlign: "center",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {first + 1}–{last} sur {items.length} parfums
+          </span>
+          <button
+            aria-label="Parfums suivants"
+            disabled={atEnd}
+            onClick={() => slide(1)}
+            style={arrow(atEnd)}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
