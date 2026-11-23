@@ -403,6 +403,175 @@ const SEED_PRODUCTS = [
     imgUrl: null,
     featured: false,
   },
+  // ── Anciens stocks (épuisés) — affichés « Disponibles sur demande » ──
+  {
+    id: 23,
+    name: "Bogoss Blue Temptation",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Fraîcheur masculine pétillante. Bergamote et pomme verte sur un fond doux de fève tonka.",
+    notes: ["Bergamote", "Pomme verte", "Fève tonka"],
+    size: "120 ml",
+    img: "🌊",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 24,
+    name: "Sunrise on the Red Sand Dunes",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Un lever de soleil sur les dunes. Agrumes lumineux et chaleur ensoleillée pour un parfum masculin solaire.",
+    notes: ["Mandarine", "Bergamote", "Ambre"],
+    size: "100 ml",
+    img: "🌅",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 25,
+    name: "Sunrise on the Red Sand Dunes Intense",
+    brand: "Zara",
+    price: 30000,
+    stock: 0,
+    cat: "Zara",
+    desc: "La version intense de Sunrise on the Red Sand Dunes. Plus chaude, plus profonde, au sillage prolongé.",
+    notes: ["Agrumes", "Ambre", "Bois"],
+    size: "100 ml",
+    img: "🏜️",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 26,
+    name: "Shades of Lust",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Une fragrance féminine sensuelle et envoûtante, pensée pour les soirées.",
+    notes: ["Fruits", "Fleurs", "Musc"],
+    size: "100 ml",
+    img: "💋",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 27,
+    name: "For Him",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Un parfum masculin intense et élégant, au caractère boisé et chaleureux.",
+    notes: ["Épices", "Bois", "Ambre"],
+    size: "80 ml",
+    img: "🖤",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 28,
+    name: "Nude Bouquet Intense",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "La version intense de Nude Bouquet. Un floral plus riche et plus tenace.",
+    notes: ["Fleurs blanches", "Fruits", "Musc"],
+    size: "100 ml",
+    img: "🌼",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 29,
+    name: "Wonder Rose",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Une rose moderne et lumineuse, douce et romantique, en grand format 150 ml.",
+    notes: ["Rose", "Pivoine", "Musc"],
+    size: "150 ml",
+    img: "🌹",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 30,
+    name: "Golden Decade Elixir",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "La version elixir de Golden Decade. Dorée, orientale et plus concentrée.",
+    notes: ["Ambre", "Vanille", "Musc"],
+    size: "80 ml",
+    img: "🏅",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 31,
+    name: "Golden Decade Summer",
+    brand: "Zara",
+    price: 25000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Golden Decade en version estivale. Plus légère et ensoleillée.",
+    notes: ["Fruits", "Fleurs", "Musc"],
+    size: "80 ml",
+    img: "☀️",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 32,
+    name: "Blackberry Oud",
+    brand: "Zara",
+    price: 27500,
+    stock: 0,
+    cat: "Zara",
+    desc: "Mûre gourmande et oud profond. Un parfum féminin intense et mystérieux.",
+    notes: ["Mûre", "Oud", "Bois"],
+    size: "100 ml",
+    img: "🫐",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 33,
+    name: "Marshmallow Glow",
+    brand: "Zara",
+    price: 22500,
+    stock: 0,
+    cat: "Zara",
+    desc: "Un parfum féminin gourmand et doux comme une guimauve.",
+    notes: ["Guimauve", "Vanille", "Musc"],
+    size: "100 ml",
+    img: "🍬",
+    imgUrl: null,
+    featured: false,
+  },
+  {
+    id: 34,
+    name: "Sera a Taormina Mangue & Oud",
+    brand: "Zara",
+    price: 30000,
+    stock: 0,
+    cat: "Zara",
+    desc: "Une soirée sicilienne en flacon. Mangue juteuse et oud chaleureux.",
+    notes: ["Mangue", "Oud", "Bois"],
+    size: "100 ml",
+    img: "🥭",
+    imgUrl: null,
+    featured: false,
+  },
 ];
 
 const SEED_USERS = [
@@ -500,6 +669,26 @@ const fmt = (n) => new Intl.NumberFormat("fr-FR").format(n) + " XAF";
 const genId = () => "CMD-" + (1000 + Math.floor(Math.random() * 8999));
 const waLink = (phone, msg = "") =>
   `https://wa.me/${phone.replace(/[\s+]/g, "")}${msg ? "?text=" + encodeURIComponent(msg) : ""}`;
+// Lien WhatsApp pour demander un parfum épuisé (ancien stock)
+const requestLink = (phone, p) =>
+  waLink(
+    phone,
+    `Bonjour, je souhaite savoir si le parfum ${p.name} (${p.brand}, ${p.size}) peut être recommandé.`,
+  );
+// Mention affichée sous le prix d'un produit épuisé
+const IndicativePrice = () => (
+  <div
+    style={{
+      fontFamily: "var(--fb)",
+      fontSize: 9,
+      letterSpacing: "0.1em",
+      textTransform: "uppercase",
+      color: "var(--muted)",
+    }}
+  >
+    Prix indicatif
+  </div>
+);
 const eligible = (s, delivered, price) =>
   delivered >= s.installMinOrders && price > s.installMinPrice;
 
@@ -1489,16 +1678,16 @@ function ShopPage({ onView, onConseils }) {
   const isMobile = useIsMobile();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("Tous");
-  // Les produits épuisés restent dans l'admin mais sont masqués de la boutique
-  const inStock = products.filter((p) => p.stock > 0);
-  const cats = ["Tous", ...new Set(inStock.map((p) => p.cat).filter(Boolean))];
-  const featured = inStock.filter((p) => p.featured);
-  const visible = inStock.filter(
+  const cats = ["Tous", ...new Set(products.map((p) => p.cat).filter(Boolean))];
+  const matches = products.filter(
     (p) =>
       (p.name.toLowerCase().includes(q.toLowerCase()) ||
         p.brand.toLowerCase().includes(q.toLowerCase())) &&
       (cat === "Tous" || p.cat === cat),
   );
+  // Produits disponibles en haut, anciens stocks (épuisés) dans une section dédiée
+  const visible = matches.filter((p) => p.stock > 0);
+  const pastStock = matches.filter((p) => p.stock === 0);
   const waHref = waLink(
     settings.whatsapp,
     `Bonjour, je souhaite des informations sur vos parfums.`,
@@ -1947,13 +2136,53 @@ function ShopPage({ onView, onConseils }) {
           <div
             style={{
               textAlign: "center",
-              padding: 64,
+              padding: pastStock.length ? 32 : 64,
               color: "var(--muted)",
               fontFamily: "var(--fd)",
               fontSize: 22,
             }}
           >
-            Aucun parfum trouvé
+            {pastStock.length
+              ? "Aucun parfum disponible actuellement pour cette recherche"
+              : "Aucun parfum trouvé"}
+          </div>
+        )}
+        {pastStock.length > 0 && (
+          <div style={{ marginTop: 56 }}>
+            <div
+              style={{
+                fontFamily: "var(--fd)",
+                fontSize: isMobile ? 24 : 30,
+                fontWeight: 400,
+                marginBottom: 6,
+              }}
+            >
+              Déjà vendus · Disponibles sur demande
+            </div>
+            <p
+              style={{
+                fontSize: 12,
+                color: "var(--muted)",
+                lineHeight: 1.7,
+                marginBottom: 22,
+                maxWidth: 620,
+              }}
+            >
+              Ces parfums ont fait partie de nos précédents stocks. Un coup de
+              cœur ? Demandez-le sur WhatsApp et nous verrons s'il peut être
+              recommandé. Les prix affichés sont indicatifs.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))",
+                gap: 14,
+              }}
+            >
+              {pastStock.map((p) => (
+                <PCard key={p.id} p={p} onView={() => onView(p)} />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -2147,10 +2376,25 @@ function PCard({ p, onView, onAdd, featured }) {
             }}
           >
             {fmt(p.price)}
+            {p.stock === 0 && <IndicativePrice />}
           </div>
-          <Btn sz="sm" onClick={onAdd} disabled={p.stock === 0}>
-            {p.stock === 0 ? "Épuisé" : "+ Panier"}
-          </Btn>
+          {p.stock === 0 ? (
+            <a
+              href={requestLink(settings.whatsapp, p)}
+              target="_blank"
+              rel="noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              <Btn sz="sm" v="wa">
+                <MessageCircle size={12} />
+                Demander
+              </Btn>
+            </a>
+          ) : (
+            <Btn sz="sm" onClick={onAdd}>
+              + Panier
+            </Btn>
+          )}
         </div>
         <div
           style={{
@@ -2187,7 +2431,7 @@ function PCard({ p, onView, onAdd, featured }) {
             }}
           >
             {p.stock === 0
-              ? "Rupture de stock"
+              ? "Ancien stock · disponible sur demande"
               : p.stock <= 3
                 ? `Plus que ${p.stock} en stock`
                 : `${p.stock} unités disponibles`}
@@ -2204,10 +2448,13 @@ function ProductPage({ product: p, onBack }) {
   const isMobile = useIsMobile();
   const [qty, setQty] = useState(1);
   const elig = canInstall(p);
-  const waHref = waLink(
-    settings.whatsapp,
-    `Bonjour, je souhaite commander : ${p.name} (${fmt(p.price)})`,
-  );
+  const soldOut = p.stock === 0;
+  const waHref = soldOut
+    ? requestLink(settings.whatsapp, p)
+    : waLink(
+        settings.whatsapp,
+        `Bonjour, je souhaite commander : ${p.name} (${fmt(p.price)})`,
+      );
   return (
     <div
       style={{
@@ -2317,7 +2564,7 @@ function ProductPage({ product: p, onBack }) {
               <div
                 style={{ fontSize: 10, color: "var(--muted)", marginBottom: 2 }}
               >
-                En stock
+                {soldOut ? "Disponibilité" : "En stock"}
               </div>
               <div
                 style={{
@@ -2325,7 +2572,9 @@ function ProductPage({ product: p, onBack }) {
                   color: p.stock <= 3 ? "#e65100" : "var(--text)",
                 }}
               >
-                {p.stock} unité{p.stock !== 1 ? "s" : ""}
+                {soldOut
+                  ? "Ancien stock · sur demande"
+                  : `${p.stock} unité${p.stock !== 1 ? "s" : ""}`}
               </div>
             </div>
           </div>
@@ -2338,7 +2587,36 @@ function ProductPage({ product: p, onBack }) {
             }}
           >
             {fmt(p.price)}
+            {soldOut && <IndicativePrice />}
           </div>
+          {soldOut ? (
+            <>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "var(--muted)",
+                  lineHeight: 1.7,
+                  marginBottom: 14,
+                }}
+              >
+                Ce parfum faisait partie d'un précédent stock. Demandez-le sur
+                WhatsApp et nous vous dirons s'il peut être recommandé, avec le
+                prix et le délai.
+              </p>
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <Btn v="wa" sz="lg">
+                  <MessageCircle size={15} />
+                  Demander ce parfum
+                </Btn>
+              </a>
+            </>
+          ) : (
+          <>
           {elig && (
             <Panel
               style={{
@@ -2461,6 +2739,8 @@ function ProductPage({ product: p, onBack }) {
               Commander par WhatsApp
             </Btn>
           </a>
+          </>
+          )}
         </div>
       </div>
     </div>
@@ -2802,7 +3082,7 @@ function ConseilsPage({ onView }) {
       >
         {visible.map((c, idx) => {
           const product = products.find((p) => p.id === c.productId);
-          if (!product || product.stock === 0) return null;
+          if (!product) return null;
           return (
             <ConseilCard
               key={c.productId}
@@ -2866,10 +3146,13 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
   const { settings } = useStore();
   const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
-  const waHref = waLink(
-    settings.whatsapp,
-    `Bonjour M. Ulrich ! Je suis intéressé(e) par le parfum ${product.name} (${fmt(product.price)}). Pouvez-vous m'aider ?`,
-  );
+  const soldOut = product.stock === 0;
+  const waHref = soldOut
+    ? requestLink(settings.whatsapp, product)
+    : waLink(
+        settings.whatsapp,
+        `Bonjour M. Ulrich ! Je suis intéressé(e) par le parfum ${product.name} (${fmt(product.price)}). Pouvez-vous m'aider ?`,
+      );
   return (
     <div
       onMouseEnter={() => setHov(true)}
@@ -3088,6 +3371,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
             }}
           >
             {fmt(product.price)}
+            {soldOut && <IndicativePrice />}
           </div>
           <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
             <Btn sz="sm" onClick={() => onView(product)}>
@@ -3101,7 +3385,7 @@ function ConseilCard({ c, product, onView, onAdd, idx }) {
             >
               <Btn sz="sm" v="wa">
                 <MessageCircle size={12} />
-                Commander
+                {soldOut ? "Demander ce parfum" : "Commander"}
               </Btn>
             </a>
           </div>
