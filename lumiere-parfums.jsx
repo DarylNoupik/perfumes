@@ -282,7 +282,8 @@ const SEED_PRODUCTS = [
     notes: ["Bergamote", "Pomme verte", "Fève tonka"],
     size: "120 ml",
     img: "💙",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795440435/Blue_Temptation_z4vmwb.jpg",
     featured: false,
   },
   {
@@ -537,7 +538,8 @@ const SEED_PRODUCTS = [
     notes: ["Ambre", "Vanille", "Musc"],
     size: "80 ml",
     img: "🏅",
-    imgUrl: null,
+    imgUrl:
+      "https://res.cloudinary.com/dhb3ceyqg/image/upload/v1795440435/Golden_Decade_Elixir_q6tm3k.jpg",
     featured: false,
   },
   {
