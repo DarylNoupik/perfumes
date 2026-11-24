@@ -10,7 +10,18 @@ import { useIsMobile } from "../../hooks/browser.js";
 import { waLink } from "../../lib/whatsapp.js";
 import { useStore } from "../../store/ShopStore.jsx";
 
-export function ShopPage({ onView, onConseils }) {
+// Défilement jusqu'à une section, sous l'en-tête collant
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = (document.getElementById("site-header")?.offsetHeight || 0) + 16;
+  window.scrollTo({
+    top: el.getBoundingClientRect().top + window.scrollY - offset,
+    behavior: "smooth",
+  });
+}
+
+export function ShopPage({ onView, onConseils, focus }) {
   const { settings, products, addToCart } = useStore();
   const isMobile = useIsMobile();
   // Nombre de parfums en stock qui ont une fiche conseil
@@ -43,13 +54,17 @@ export function ShopPage({ onView, onConseils }) {
   );
   const goTo = (setter, anchor) => (n) => {
     setter(n);
-    const el = document.getElementById(anchor);
-    if (el)
-      window.scrollTo({
-        top: el.getBoundingClientRect().top + window.scrollY - 80,
-        behavior: "smooth",
-      });
+    scrollToSection(anchor);
   };
+  // Recherche, marque ou section choisie dans l'en-tête
+  useEffect(() => {
+    if (!focus) return;
+    setQ(focus.q);
+    setCat(focus.cat);
+    // Après le retour en haut fait au changement de page
+    const t = setTimeout(() => scrollToSection(focus.anchor), 80);
+    return () => clearTimeout(t);
+  }, [focus?.key]);
   const waHref = waLink(
     settings.whatsapp,
     `Bonjour, je souhaite des informations sur vos parfums.`,
@@ -159,11 +174,7 @@ export function ShopPage({ onView, onConseils }) {
           >
             <Btn
               sz="lg"
-              onClick={() =>
-                document
-                  .getElementById("catalogue")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+              onClick={() => scrollToSection("catalogue")}
             >
               Découvrir les parfums
             </Btn>

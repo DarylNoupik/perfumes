@@ -24,10 +24,15 @@ function Shell() {
   const isMobile = useIsMobile();
   const [view, setView] = useState("shop");
   const [selProduct, setSelProduct] = useState(null);
-  const nav = (v) => {
+  // Recherche / marque / section demandée depuis l'en-tête, appliquée par la boutique
+  const [shopFocus, setShopFocus] = useState(null);
+  const nav = (v, focus = null) => {
+    setShopFocus(focus);
     setView(v);
     if (v !== "product") setSelProduct(null);
   };
+  const browse = ({ q = "", cat = "Tous", anchor = "catalogue" } = {}) =>
+    nav("shop", { q, cat, anchor, key: Date.now() });
   const openProduct = (p) => {
     setSelProduct(p);
     setView("product");
@@ -62,13 +67,17 @@ function Shell() {
           {toast.msg}
         </div>
       )}
-      <AppHeader view={view} nav={nav} />
+      <AppHeader view={view} nav={nav} onBrowse={browse} />
       <main
         key={`${view}-${selProduct?.id ?? ""}`}
         style={{ animation: "pageIn .2s ease-out" }}
       >
         {view === "shop" && (
-          <ShopPage onView={openProduct} onConseils={() => nav("conseils")} />
+          <ShopPage
+            onView={openProduct}
+            onConseils={() => nav("conseils")}
+            focus={shopFocus}
+          />
         )}
         {view === "conseils" && <ConseilsPage onView={openProduct} />}
         {view === "product" && selProduct && (

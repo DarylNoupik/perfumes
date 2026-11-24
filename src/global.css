@@ -3,12 +3,12 @@
   --gold:#9A6E2E;--gold-text:#86602A;--gold-l:#C9A84C;--gold-dim:rgba(154,110,46,.08);
   --bg:#FAF7F2;--surf:#FFFFFF;--surf2:#F3EEE7;--border:rgba(120,90,50,.12);
   --text:#2A2118;--muted:#736657;
-  --fd:'Cormorant Garamond',serif;--fb:'DM Sans',sans-serif;
+  --fd:'Cormorant Garamond',serif;--fb:'Poppins','Helvetica Neue',Arial,sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--fb)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--gold-l);border-radius:2px}
-input,select,textarea{font-family:var(--fb)}
+button,input,select,textarea{font-family:var(--fb)}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 @keyframes lbIn{from{opacity:0}to{opacity:1}}
 @keyframes pageIn{from{opacity:0}to{opacity:1}}
@@ -19,7 +19,8 @@ input,select,textarea{font-family:var(--fb)}
 button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-text)!important;outline-offset:2px}
 /* Retour visuel au toucher sur mobile */
 @media (hover:none){.pcard:active{transform:scale(.98)!important;transition:transform .1s!important}}
-.carousel-track{scrollbar-width:none}
+.carousel-track,.header-cats{scrollbar-width:none}
+.header-cats::-webkit-scrollbar{display:none}
 .carousel-track::-webkit-scrollbar{display:none}
 .carousel-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:10px}
 @media (prefers-reduced-motion: reduce){
