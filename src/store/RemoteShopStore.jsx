@@ -108,19 +108,22 @@ export function RemoteShopStore({ children }) {
   };
   const requestPasswordReset = async (email) => {
     const { error: failure } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: SITE_URL });
-    if (failure) notify(failure.message, "err");
-    // Même message que le compte existe ou non, pour ne pas révéler les adresses inscrites
+    // Message générique dans tous les cas, pour ne rien révéler sur les adresses inscrites
+    if (failure) notify("Envoi impossible pour le moment. Réessaie dans quelques minutes.", "err");
     else notify("Si un compte existe pour cette adresse, un e-mail vient d'être envoyé.");
     return !failure;
   };
   const updatePassword = async (password) => {
     const { error: failure } = await supabase.auth.updateUser({ password });
-    if (failure) notify(failure.message, "err");
-    else {
-      setRecovering(false);
-      notify("Mot de passe modifié.");
+    if (failure) {
+      notify(failure.message, "err");
+      return false;
     }
-    return !failure;
+    // Déconnecte les autres appareils : utile si le compte avait été piraté
+    await supabase.auth.signOut({ scope: "others" });
+    setRecovering(false);
+    notify("Mot de passe modifié.");
+    return true;
   };
   const logout = async () => {
     const { error: failure } = await supabase.auth.signOut();
@@ -190,7 +193,11 @@ export function RemoteShopStore({ children }) {
     settings, inventory, products, orders, session: session ?? null, remote: true,
     users: shop?.users ?? [], cart: currentCart, myOrders, deliveredCount, canInstall, toast, notify,
     login, register, logout, requestPasswordReset, updatePassword, recovering,
-    cancelRecovery: () => setRecovering(false), addToCart, removeFromCart, clearCart, placeOrder,
+    // « Plus tard » ferme la session ouverte par le lien de réinitialisation
+    cancelRecovery: async () => {
+      setRecovering(false);
+      await supabase.auth.signOut();
+    }, addToCart, removeFromCart, clearCart, placeOrder,
     cartTotal: currentCart.reduce((sum, item) => sum + item.qty * item.price, 0),
     cartCount: cart.reduce((sum, item) => sum + item.qty, 0),
     updateSettings: (patch) => run(supabase.from("shop_settings").update({ storefront: patch }).eq("id", 1).select("id").single(), "Paramètres enregistrés."),
