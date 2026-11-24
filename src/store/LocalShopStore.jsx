@@ -187,6 +187,19 @@ export function LocalShopStore({ children }) {
     notify("Commande confirmée ! 🎉");
     return o.id;
   };
+  const updateUser = (id, { name, phone, role }) => {
+    if (!name.trim()) {
+      notify("Le nom est obligatoire.", "err");
+      return false;
+    }
+    if (id === session?.id && role !== "admin") {
+      notify("Tu ne peux pas retirer ton propre rôle admin.", "err");
+      return false;
+    }
+    _setUsers((p) => p.map((u) => (u.id === id ? { ...u, name: name.trim(), phone: phone.trim(), role } : u)));
+    notify("Utilisateur mis à jour.");
+    return true;
+  };
   const updateOrderStatus = (id, status) => {
     const result = applyOrderStatus(currentInventory.current, id, status);
     if (result.error) notify(result.error, "err");
@@ -293,6 +306,7 @@ export function LocalShopStore({ children }) {
         placeOrder,
         updateOrderStatus,
         users,
+        updateUser,
         register,
         session,
         login,

@@ -184,6 +184,9 @@ export function RemoteShopStore({ children }) {
       product_ref: movement.productId, movement_kind: movement.kind, movement_date: movement.date,
       units: movement.quantity, amount: movement.unitPrice, remark: movement.note,
     })),
+    updateUser: (id, { name, phone, role }) => run(rpc("update_shop_user", {
+      user_ref: id, new_name: name, new_phone: phone, new_role: role,
+    }), "Utilisateur mis à jour."),
     updateActualSalePrice, importHistoricalSales, uploadProductImg,
   };
 
