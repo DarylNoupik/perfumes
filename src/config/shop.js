@@ -2,6 +2,9 @@ export const CONTACT_WHATSAPP_NUMBER =
   import.meta.env.VITE_CONTACT_WHATSAPP_NUMBER?.replace(/[\s+]/g, "") ||
   "237692370058";
 
+// Adresse où renvoient les liens des e-mails (confirmation, mot de passe oublié)
+export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://dihud.shop";
+
 export const SEED_SETTINGS = {
   shopName: "DIHU",
   tagline: "Maison de Parfums",

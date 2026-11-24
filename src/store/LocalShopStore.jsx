@@ -101,6 +101,10 @@ export function LocalShopStore({ children }) {
     setSession(null);
     notify("Déconnecté");
   };
+  const requestPasswordReset = () => {
+    notify("Mot de passe oublié indisponible en mode démo.", "err");
+    return false;
+  };
   const register = (data) => {
     if (users.find((u) => u.email === data.email)) {
       notify("Email déjà utilisé", "err");
@@ -308,6 +312,10 @@ export function LocalShopStore({ children }) {
         users,
         updateUser,
         register,
+        requestPasswordReset,
+        recovering: false,
+        updatePassword: () => false,
+        cancelRecovery: () => {},
         session,
         login,
         logout,

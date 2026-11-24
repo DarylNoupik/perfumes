@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AccountPage } from "./features/account/AccountPage.jsx";
+import { ResetPasswordPage } from "./features/account/ResetPasswordPage.jsx";
 import { AdminPage } from "./features/admin/AdminPage.jsx";
 import { ConseilsPage } from "./features/advice/ConseilsPage.jsx";
 import { CartPage } from "./features/cart/CartPage.jsx";
@@ -20,7 +21,7 @@ export default function App() {
 }
 
 function Shell() {
-  const { toast, session, settings, cartCount } = useStore();
+  const { toast, session, settings, cartCount, recovering } = useStore();
   const isMobile = useIsMobile();
   const [view, setView] = useState("shop");
   const [selProduct, setSelProduct] = useState(null);
@@ -72,24 +73,30 @@ function Shell() {
         key={`${view}-${selProduct?.id ?? ""}`}
         style={{ animation: "pageIn .2s ease-out" }}
       >
-        {view === "shop" && (
-          <ShopPage
-            onView={openProduct}
-            onConseils={() => nav("conseils")}
-            focus={shopFocus}
-          />
+        {recovering ? (
+          <ResetPasswordPage />
+        ) : (
+          <>
+            {view === "shop" && (
+              <ShopPage
+                onView={openProduct}
+                onConseils={() => nav("conseils")}
+                focus={shopFocus}
+              />
+            )}
+            {view === "conseils" && <ConseilsPage onView={openProduct} />}
+            {view === "product" && selProduct && (
+              <ProductPage product={selProduct} onBack={() => nav("shop")} />
+            )}
+            {view === "cart" && <CartPage nav={nav} />}
+            {view === "checkout" && <CheckoutPage nav={nav} />}
+            {view === "account" && <AccountPage nav={nav} />}
+            {view === "admin" &&
+              (session?.role === "admin" || session?.role === "vendor") && (
+                <AdminPage />
+              )}
+          </>
         )}
-        {view === "conseils" && <ConseilsPage onView={openProduct} />}
-        {view === "product" && selProduct && (
-          <ProductPage product={selProduct} onBack={() => nav("shop")} />
-        )}
-        {view === "cart" && <CartPage nav={nav} />}
-        {view === "checkout" && <CheckoutPage nav={nav} />}
-        {view === "account" && <AccountPage nav={nav} />}
-        {view === "admin" &&
-          (session?.role === "admin" || session?.role === "vendor") && (
-            <AdminPage />
-          )}
       </main>
       <FloatingWhatsApp />
     </div>

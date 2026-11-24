@@ -6,14 +6,40 @@ import { fmt } from "../../lib/currency.js";
 import { useStore } from "../../store/ShopStore.jsx";
 
 export function AccountPage({ nav }) {
-  const { session, login, register, myOrders, deliveredCount, settings } =
-    useStore();
+  const {
+    session,
+    login,
+    register,
+    requestPasswordReset,
+    myOrders,
+    deliveredCount,
+    settings,
+  } = useStore();
   const isMobile = useIsMobile();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const linkBtn = {
+    background: "none",
+    border: "none",
+    padding: "4px 2px",
+    color: "var(--gold-text)",
+    fontSize: 13,
+    cursor: "pointer",
+  };
+  const submit = async () => {
+    if (mode === "login") return login(email, pass);
+    if (mode === "register") return register({ name, email, password: pass, phone });
+    if (!email.trim()) return;
+    if (await requestPasswordReset(email)) setResetSent(true);
+  };
+  const switchMode = (m) => {
+    setMode(m);
+    setResetSent(false);
+  };
   if (!session)
     return (
       <div style={{ maxWidth: 420, margin: "76px auto", padding: "0 24px" }}>
@@ -32,8 +58,25 @@ export function AccountPage({ nav }) {
           <h2
             style={{ fontFamily: "var(--fb)", fontSize: 30, fontWeight: 400 }}
           >
-            {mode === "login" ? "Bienvenue" : "Créer un compte"}
+            {mode === "login"
+              ? "Bienvenue"
+              : mode === "register"
+                ? "Créer un compte"
+                : "Mot de passe oublié"}
           </h2>
+          {mode === "forgot" && (
+            <p
+              style={{
+                fontSize: 14,
+                color: "var(--muted)",
+                lineHeight: 1.6,
+                marginTop: 10,
+              }}
+            >
+              Indique l'e-mail de ton compte : on t'envoie un lien pour choisir
+              un nouveau mot de passe.
+            </p>
+          )}
         </div>
         <Panel>
           {mode === "register" && (
@@ -53,14 +96,29 @@ export function AccountPage({ nav }) {
             placeholder="vous@exemple.cm"
             req
           />
-          <Field
-            label="Mot de passe"
-            value={pass}
-            onChange={setPass}
-            type="password"
-            placeholder="••••••••"
-            req
-          />
+          {mode !== "forgot" && (
+            <Field
+              label="Mot de passe"
+              value={pass}
+              onChange={setPass}
+              type="password"
+              placeholder="••••••••"
+              req
+            />
+          )}
+          {mode === "login" && (
+            <div style={{ textAlign: "right", marginTop: -8, marginBottom: 6 }}>
+              <button type="button" onClick={() => switchMode("forgot")} style={linkBtn}>
+                Mot de passe oublié ?
+              </button>
+            </div>
+          )}
+          {mode === "forgot" && resetSent && (
+            <p role="status" style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
+              C'est envoyé. Ouvre l'e-mail et clique sur le lien (pense à
+              regarder dans les spams).
+            </p>
+          )}
           {mode === "register" && (
             <Field
               label="Téléphone"
@@ -73,14 +131,16 @@ export function AccountPage({ nav }) {
           <Btn
             sz="lg"
             full
-            onClick={() =>
-              mode === "login"
-                ? login(email, pass)
-                : register({ name, email, password: pass, phone })
-            }
+            onClick={submit}
             style={{ marginTop: 8 }}
           >
-            {mode === "login" ? "Se connecter" : "Créer mon compte"}
+            {mode === "login"
+              ? "Se connecter"
+              : mode === "register"
+                ? "Créer mon compte"
+                : resetSent
+                  ? "Renvoyer le lien"
+                  : "Envoyer le lien"}
           </Btn>
           <div
             style={{
@@ -91,12 +151,13 @@ export function AccountPage({ nav }) {
             }}
           >
             {mode === "login" ? "Pas encore de compte ? " : "Déjà client ? "}
-            <span
-              onClick={() => setMode(mode === "login" ? "register" : "login")}
-              style={{ color: "var(--gold)", cursor: "pointer" }}
+            <button
+              type="button"
+              onClick={() => switchMode(mode === "login" ? "register" : "login")}
+              style={linkBtn}
             >
               {mode === "login" ? "S'inscrire" : "Se connecter"}
-            </span>
+            </button>
           </div>
           <div
             style={{

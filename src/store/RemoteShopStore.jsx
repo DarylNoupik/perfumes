@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SEED_SETTINGS } from "../config/shop.js";
+import { SEED_SETTINGS, SITE_URL } from "../config/shop.js";
 import { ShopContext } from "./ShopContext.js";
 import { dataOf, detailsToRow, movementToRow, productToRow, profileOf, readShop, supabase } from "./supabaseShop.js";
 
@@ -11,13 +11,17 @@ export function RemoteShopStore({ children }) {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [cart, setCart] = useState([]);
+  // Arrivé depuis le lien « mot de passe oublié » : on demande le nouveau mot de passe
+  const [recovering, setRecovering] = useState(false);
   const checkoutKey = useRef(null);
   const noticeTimer = useRef(null);
   const fetchVersion = useRef(0);
   const activeSession = useRef(undefined);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, authSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, authSession) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+      if (event === "SIGNED_OUT") setRecovering(false);
       const next = profileOf(authSession?.user);
       if (next?.id !== activeSession.current?.id || next?.role !== activeSession.current?.role) {
         fetchVersion.current++;
@@ -96,10 +100,26 @@ export function RemoteShopStore({ children }) {
   const register = async ({ name, phone, email, password }) => {
     const { data, error: failure } = await supabase.auth.signUp({
       email: email.trim(), password,
-      options: { emailRedirectTo: window.location.origin, data: { name: name.trim(), phone: phone.trim() } },
+      options: { emailRedirectTo: SITE_URL, data: { name: name.trim(), phone: phone.trim() } },
     });
     if (failure) notify(failure.message, "err");
     else notify(data.session ? "Bienvenue !" : "Vérifie ton e-mail pour confirmer ton compte.");
+    return !failure;
+  };
+  const requestPasswordReset = async (email) => {
+    const { error: failure } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: SITE_URL });
+    if (failure) notify(failure.message, "err");
+    // Même message que le compte existe ou non, pour ne pas révéler les adresses inscrites
+    else notify("Si un compte existe pour cette adresse, un e-mail vient d'être envoyé.");
+    return !failure;
+  };
+  const updatePassword = async (password) => {
+    const { error: failure } = await supabase.auth.updateUser({ password });
+    if (failure) notify(failure.message, "err");
+    else {
+      setRecovering(false);
+      notify("Mot de passe modifié.");
+    }
     return !failure;
   };
   const logout = async () => {
@@ -169,7 +189,8 @@ export function RemoteShopStore({ children }) {
   const value = {
     settings, inventory, products, orders, session: session ?? null, remote: true,
     users: shop?.users ?? [], cart: currentCart, myOrders, deliveredCount, canInstall, toast, notify,
-    login, register, logout, addToCart, removeFromCart, clearCart, placeOrder,
+    login, register, logout, requestPasswordReset, updatePassword, recovering,
+    cancelRecovery: () => setRecovering(false), addToCart, removeFromCart, clearCart, placeOrder,
     cartTotal: currentCart.reduce((sum, item) => sum + item.qty * item.price, 0),
     cartCount: cart.reduce((sum, item) => sum + item.qty, 0),
     updateSettings: (patch) => run(supabase.from("shop_settings").update({ storefront: patch }).eq("id", 1).select("id").single(), "Paramètres enregistrés."),
