@@ -124,15 +124,21 @@ export function RemoteShopStore({ children }) {
     setCart((current) => current.filter((item) => item.id !== id));
   };
   const placeOrder = async (payment, installments, _plan, contact) => {
-    if (!session || !cart.length) return false;
+    if (!cart.length) return false;
+    if (!session) {
+      notify("Connecte-toi pour passer commande.", "err");
+      return false;
+    }
     checkoutKey.current ??= crypto.randomUUID();
-    const saved = await run(rpc("checkout_shop", {
+    const result = await perform(rpc("checkout_shop", {
       customer_name: contact.name, customer_phone: contact.phone, delivery_address: contact.address,
       payment_method: payment, request_id: checkoutKey.current, installments,
       items: cart.map(({ id, qty }) => ({ product_id: id, quantity: qty })),
     }), "Commande confirmée !");
-    if (saved) clearCart();
-    return saved;
+    if (!result) return false;
+    clearCart();
+    // Renvoie la référence de la commande (uuid) pour le message WhatsApp
+    return result.data || true;
   };
 
   const updateActualSalePrice = (sale, price) => {

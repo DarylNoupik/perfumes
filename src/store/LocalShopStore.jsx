@@ -138,7 +138,10 @@ export function LocalShopStore({ children }) {
 
   // Orders
   const placeOrder = (payMethod, inst, plan, contact) => {
-    if (!session) return false;
+    if (!session) {
+      notify("Connecte-toi pour passer commande.", "err");
+      return false;
+    }
     const current = currentInventory.current;
     if (cart.some((item) => (current.products.find(({ id }) => id === item.id)?.stock ?? 0) < item.qty)) {
       notify("Le stock a changé. Vérifie les quantités de ton panier.", "err");
@@ -182,7 +185,7 @@ export function LocalShopStore({ children }) {
     if (!saved) return false;
     clearCart();
     notify("Commande confirmée ! 🎉");
-    return true;
+    return o.id;
   };
   const updateOrderStatus = (id, status) => {
     const result = applyOrderStatus(currentInventory.current, id, status);

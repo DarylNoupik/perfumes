@@ -1,8 +1,16 @@
-import { ArrowLeft, Check, Layers } from "lucide-react";
+import { ArrowLeft, Check, Layers, LogIn } from "lucide-react";
 import { useRef, useState } from "react";
 import { Btn, Field, Panel } from "../../components/ui.jsx";
 import { fmt } from "../../lib/currency.js";
+import { waLink } from "../../lib/whatsapp.js";
 import { useStore } from "../../store/ShopStore.jsx";
+
+// Modes de paiement proposés. Mobile Money est masqué pour le lancement :
+// passer enabled à true pour le réafficher.
+const PAYMENT_OPTIONS = [
+  { k: "momo", label: "Mobile Money (MTN / Orange)", icon: "📱", enabled: false },
+  { k: "whatsapp", label: "Finaliser sur WhatsApp", icon: "💬", enabled: true },
+].filter((m) => m.enabled);
 
 export function CheckoutPage({ nav }) {
   const { cart, cartTotal, session, settings, placeOrder, canInstall } =
@@ -10,17 +18,33 @@ export function CheckoutPage({ nav }) {
   const [name, setName] = useState(session?.name || "");
   const [phone, setPhone] = useState(session?.phone || "");
   const [address, setAddress] = useState("");
-  const [pay, setPay] = useState("momo");
+  const [pay, setPay] = useState(PAYMENT_OPTIONS[0].k);
   const [inst, setInst] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [missing, setMissing] = useState([]);
   const submitting = useRef(false);
   const canInst = cart.some((i) => canInstall(i));
   const parts = Math.max(2, settings.installMinOrders);
   const part = Math.ceil(cartTotal / parts);
   const confirm = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim() || submitting.current) return;
+    if (submitting.current) return;
+    const empty = [
+      [name, "ton nom"],
+      [phone, "ton téléphone"],
+      [address, "ton adresse"],
+    ]
+      .filter(([v]) => !v.trim())
+      .map(([, l]) => l);
+    setMissing(empty);
+    if (empty.length) return;
     submitting.current = true;
     setSaving(true);
+    // Fenêtre ouverte tout de suite pendant le clic, sinon le navigateur
+    // bloque l'ouverture qui arrive après l'enregistrement de la commande
+    const viaWhatsApp = pay === "whatsapp";
+    const waWindow = viaWhatsApp ? window.open("", "_blank") : null;
+    const lines = cart.map((i) => `- ${i.name} x${i.qty} : ${fmt(i.price * i.qty)}`);
+    const total = cartTotal;
     try {
       const saved = await placeOrder(
         pay === "momo" ? "Mobile Money" : "WhatsApp",
@@ -35,7 +59,22 @@ export function CheckoutPage({ nav }) {
           : null,
         { name, phone, address },
       );
+      if (saved && viaWhatsApp) {
+        const ref = typeof saved === "string" ? `Commande n° ${saved}\n` : "";
+        const msg = [
+          "Bonjour, je viens de passer commande sur le site.",
+          ref + lines.join("\n"),
+          `Total : ${fmt(total)}`,
+          `Nom : ${name.trim()}\nTéléphone : ${phone.trim()}\nAdresse : ${address.trim()}`,
+        ].join("\n\n");
+        const link = waLink(settings.whatsapp, msg);
+        if (waWindow) waWindow.location.href = link;
+        else window.location.href = link;
+      } else waWindow?.close();
       if (saved) nav("account");
+    } catch (failure) {
+      waWindow?.close();
+      throw failure;
     } finally {
       submitting.current = false;
       setSaving(false);
@@ -129,6 +168,7 @@ export function CheckoutPage({ nav }) {
           value={address}
           onChange={setAddress}
           placeholder="Quartier, ville"
+          req
         />
       </Panel>
       <Panel style={{ marginBottom: 16 }}>
@@ -143,10 +183,14 @@ export function CheckoutPage({ nav }) {
         >
           Paiement
         </div>
-        {[
-          { k: "momo", label: "Mobile Money (MTN / Orange)", icon: "📱" },
-          { k: "whatsapp", label: "WhatsApp / Appel téléphonique", icon: "💬" },
-        ].map((m) => (
+        {pay === "whatsapp" && (
+          <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.6, marginBottom: 12 }}>
+            Après la confirmation, WhatsApp s'ouvre avec le récapitulatif de ta
+            commande. Il te suffit d'appuyer sur Envoyer, et on règle le paiement
+            et la livraison avec toi dans la conversation.
+          </p>
+        )}
+        {PAYMENT_OPTIONS.map((m) => (
           <div
             key={m.k}
             onClick={() => setPay(m.k)}
@@ -260,9 +304,30 @@ export function CheckoutPage({ nav }) {
           )}
         </Panel>
       )}
-      <Btn sz="lg" full onClick={confirm} disabled={!name.trim() || !phone.trim() || !address.trim() || saving}>
+      {!session && (
+        <Panel style={{ marginBottom: 16 }}>
+          <p style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 12 }}>
+            Connecte-toi ou crée un compte pour valider ta commande. Ton panier
+            reste enregistré.
+          </p>
+          <Btn v="outline" onClick={() => nav("account")}>
+            <LogIn size={14} aria-hidden="true" />
+            Se connecter
+          </Btn>
+        </Panel>
+      )}
+      {missing.length > 0 && (
+        <p role="alert" style={{ color: "#c62828", fontSize: 14, marginBottom: 12 }}>
+          Il manque {missing.join(", ")}.
+        </p>
+      )}
+      <Btn sz="lg" full onClick={confirm} disabled={saving || !session || !cart.length}>
         <Check size={15} />
-        {saving ? "Enregistrement…" : "Confirmer la commande"}
+        {saving
+          ? "Enregistrement…"
+          : pay === "whatsapp"
+            ? "Confirmer et envoyer sur WhatsApp"
+            : "Confirmer la commande"}
       </Btn>
     </div>
   );
