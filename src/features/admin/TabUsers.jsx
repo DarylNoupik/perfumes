@@ -8,7 +8,7 @@ export function TabUsers() {
     <div>
       <h2
         style={{
-          fontFamily: "var(--fd)",
+          fontFamily: "var(--fb)",
           fontSize: 30,
           marginBottom: 20,
           fontWeight: 400,

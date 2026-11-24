@@ -54,7 +54,7 @@ export function CountdownBanner() {
                 style={{
                   color: "var(--gold-l)",
                   fontSize: isMobile ? 20 : 26,
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   lineHeight: 1,
                   marginRight: isMobile ? -6 : -12,
                 }}
@@ -65,7 +65,7 @@ export function CountdownBanner() {
             <div style={{ textAlign: "center" }}>
               <div
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   fontSize: isMobile ? 28 : 38,
                   color: "var(--gold-l)",
                   fontWeight: 600,

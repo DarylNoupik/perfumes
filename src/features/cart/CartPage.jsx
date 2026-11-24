@@ -17,7 +17,7 @@ export function CartPage({ nav }) {
         />
         <h2
           style={{
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: 28,
             color: "var(--muted)",
             marginBottom: 6,
@@ -41,7 +41,7 @@ export function CartPage({ nav }) {
     >
       <h2
         style={{
-          fontFamily: "var(--fd)",
+          fontFamily: "var(--fb)",
           fontSize: isMobile ? 26 : 34,
           marginBottom: 22,
         }}
@@ -83,7 +83,7 @@ export function CartPage({ nav }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   fontSize: isMobile ? 15 : 17,
                   whiteSpace: "nowrap",
                   overflow: "hidden",
@@ -98,7 +98,7 @@ export function CartPage({ nav }) {
               {isMobile && (
                 <div
                   style={{
-                    fontFamily: "var(--fd)",
+                    fontFamily: "var(--fb)",
                     fontSize: 15,
                     color: "var(--gold-text)",
                     marginTop: 3,
@@ -111,7 +111,7 @@ export function CartPage({ nav }) {
             {!isMobile && (
               <div
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   fontSize: 18,
                   color: "var(--gold)",
                   marginRight: 14,
@@ -155,7 +155,7 @@ export function CartPage({ nav }) {
             </div>
             <div
               style={{
-                fontFamily: "var(--fd)",
+                fontFamily: "var(--fb)",
                 fontSize: 30,
                 color: "var(--gold)",
               }}

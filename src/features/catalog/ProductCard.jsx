@@ -74,7 +74,7 @@ export function ProductCard({ p, onView, onAdd }) {
         <div
           style={{
             fontSize: 12,
-            letterSpacing: "0.14em",
+            letterSpacing: "0.06em",
             textTransform: "uppercase",
             color: "var(--muted)",
             marginBottom: 4,
@@ -89,9 +89,9 @@ export function ProductCard({ p, onView, onAdd }) {
         <div
           {...a11yClick(onView, `Voir la fiche de ${p.name}`)}
           style={{
-            fontFamily: "var(--fd)",
-            fontSize: isMobile ? 17 : 19,
-            fontWeight: 500,
+            fontFamily: "var(--fb)",
+            fontSize: isMobile ? 16 : 18,
+            fontWeight: 600,
             lineHeight: 1.2,
             marginBottom: isMobile ? 8 : 10,
             cursor: "pointer",
@@ -138,10 +138,10 @@ export function ProductCard({ p, onView, onAdd }) {
           >
             <div
               style={{
-                fontFamily: "var(--fd)",
-                fontSize: isMobile ? 18 : 20,
-                color: "var(--gold)",
-                fontWeight: 500,
+                fontFamily: "var(--fb)",
+                fontSize: isMobile ? 16 : 18,
+                color: "var(--text)",
+                fontWeight: 600,
                 fontVariantNumeric: "tabular-nums",
               }}
             >

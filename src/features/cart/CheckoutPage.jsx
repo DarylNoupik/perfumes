@@ -52,7 +52,7 @@ export function CheckoutPage({ nav }) {
         <ArrowLeft size={13} />
         Retour
       </Btn>
-      <h2 style={{ fontFamily: "var(--fd)", fontSize: 34, marginBottom: 28 }}>
+      <h2 style={{ fontFamily: "var(--fb)", fontSize: 34, marginBottom: 28 }}>
         Finaliser la commande
       </h2>
       <Panel style={{ marginBottom: 16 }}>
@@ -89,7 +89,7 @@ export function CheckoutPage({ nav }) {
             display: "flex",
             justifyContent: "space-between",
             paddingTop: 10,
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: 19,
           }}
         >
@@ -248,7 +248,7 @@ export function CheckoutPage({ nav }) {
                   <span
                     style={{
                       color: n === 1 ? "var(--gold)" : "var(--muted)",
-                      fontFamily: "var(--fd)",
+                      fontFamily: "var(--fb)",
                       fontSize: 15,
                     }}
                   >

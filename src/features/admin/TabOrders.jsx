@@ -11,7 +11,7 @@ export function TabOrders({ openInventory }) {
     <div>
       <h2
         style={{
-          fontFamily: "var(--fd)",
+          fontFamily: "var(--fb)",
           fontSize: 30,
           marginBottom: 20,
           fontWeight: 400,
@@ -46,7 +46,7 @@ export function TabOrders({ openInventory }) {
                     flexWrap: "wrap",
                   }}
                 >
-                  <span style={{ fontFamily: "var(--fd)", fontSize: 15 }}>
+                  <span style={{ fontFamily: "var(--fb)", fontSize: 15 }}>
                     {o.id}
                   </span>
                   {sbadge(o.status)}
@@ -84,7 +84,7 @@ export function TabOrders({ openInventory }) {
               >
                 <div
                   style={{
-                    fontFamily: "var(--fd)",
+                    fontFamily: "var(--fb)",
                     fontSize: 20,
                     color: "var(--gold)",
                   }}
@@ -157,7 +157,7 @@ export function TabOrders({ openInventory }) {
               textAlign: "center",
               padding: 64,
               color: "var(--muted)",
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 20,
             }}
           >

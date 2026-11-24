@@ -20,7 +20,7 @@ export function TabDashboard({ openInventory }) {
     <div>
       <h2
         style={{
-          fontFamily: "var(--fd)",
+          fontFamily: "var(--fb)",
           fontSize: 30,
           marginBottom: 28,
           fontWeight: 400,
@@ -69,7 +69,7 @@ export function TabDashboard({ openInventory }) {
             </div>
             <div
               style={{
-                fontFamily: "var(--fd)",
+                fontFamily: "var(--fb)",
                 fontSize: 26,
                 color: s.c,
                 marginBottom: 3,
@@ -90,7 +90,7 @@ export function TabDashboard({ openInventory }) {
       )}
       <h3
         style={{
-          fontFamily: "var(--fd)",
+          fontFamily: "var(--fb)",
           fontSize: 20,
           marginBottom: 14,
           fontWeight: 400,
@@ -118,7 +118,7 @@ export function TabDashboard({ openInventory }) {
               {sbadge(o.status)}
               <span
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   color: "var(--gold)",
                   fontSize: 16,
                 }}

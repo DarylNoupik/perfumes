@@ -5,7 +5,7 @@
 }
 
 .inventory-page h2 {
-  font: 400 30px var(--fd);
+  font: 600 26px var(--fb);
 }
 
 .inventory-page p {
@@ -70,7 +70,7 @@
 .inventory-metrics strong {
   display: block;
   margin-top: 6px;
-  font: 600 24px var(--fd);
+  font: 600 24px var(--fb);
 }
 
 .inventory-table {

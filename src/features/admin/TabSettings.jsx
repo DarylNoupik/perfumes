@@ -24,7 +24,7 @@ export function TabSettings({ openInventory }) {
           gap: 10,
         }}
       >
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 30, fontWeight: 400 }}>
+        <h2 style={{ fontFamily: "var(--fb)", fontSize: 30, fontWeight: 400 }}>
           Paramètres de la boutique
         </h2>
         <Btn onClick={() => updateSettings(draft)}>
@@ -43,7 +43,7 @@ export function TabSettings({ openInventory }) {
         <Panel>
           <div
             style={{
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 17,
               marginBottom: 18,
               color: "var(--gold)",
@@ -79,7 +79,7 @@ export function TabSettings({ openInventory }) {
         <Panel>
           <div
             style={{
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 17,
               marginBottom: 18,
               color: "var(--gold)",
@@ -119,7 +119,7 @@ export function TabSettings({ openInventory }) {
         <Panel style={{ gridColumn: "1/-1" }}>
           <div
             style={{
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 17,
               marginBottom: 18,
               color: "var(--gold)",
@@ -160,7 +160,7 @@ export function TabSettings({ openInventory }) {
         <Panel>
           <div
             style={{
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 17,
               marginBottom: 18,
               color: "var(--gold)",

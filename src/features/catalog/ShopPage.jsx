@@ -111,7 +111,7 @@ export function ShopPage({ onView, onConseils }) {
           <div
             style={{
               fontSize: 12,
-              letterSpacing: "0.45em",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--gold-text)",
               marginBottom: 22,
@@ -123,7 +123,7 @@ export function ShopPage({ onView, onConseils }) {
           <h1
             style={{
               fontFamily: "var(--fd)",
-              fontSize: "clamp(46px,7.5vw,84px)",
+              fontSize: "clamp(42px,7vw,76px)",
               fontWeight: 300,
               lineHeight: 1.06,
               marginBottom: 22,
@@ -239,7 +239,7 @@ export function ShopPage({ onView, onConseils }) {
               right: isMobile ? -30 : 40,
               top: "50%",
               transform: "translateY(-50%)",
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: isMobile ? 90 : 140,
               color: "rgba(201,168,76,.06)",
               fontStyle: "italic",
@@ -256,7 +256,7 @@ export function ShopPage({ onView, onConseils }) {
             <div
               style={{
                 fontSize: 12,
-                letterSpacing: "0.38em",
+                letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 color: "var(--gold-l)",
                 marginBottom: 10,
@@ -266,9 +266,9 @@ export function ShopPage({ onView, onConseils }) {
             </div>
             <h2
               style={{
-                fontFamily: "var(--fd)",
-                fontSize: isMobile ? 24 : 34,
-                fontWeight: 300,
+                fontFamily: "var(--fb)",
+                fontSize: isMobile ? 22 : 30,
+                fontWeight: 500,
                 color: "#FAF7F2",
                 lineHeight: 1.15,
                 marginBottom: 12,
@@ -356,7 +356,7 @@ export function ShopPage({ onView, onConseils }) {
           }}
         >
           <h2
-            style={{ fontFamily: "var(--fd)", fontSize: 30, fontWeight: 400 }}
+            style={{ fontFamily: "var(--fb)", fontSize: 30, fontWeight: 400 }}
           >
             Catalogue complet
           </h2>
@@ -454,7 +454,7 @@ export function ShopPage({ onView, onConseils }) {
               textAlign: "center",
               padding: pastStock.length ? 32 : 64,
               color: "var(--muted)",
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 22,
             }}
           >
@@ -467,7 +467,7 @@ export function ShopPage({ onView, onConseils }) {
           <div id="anciens-stocks" style={{ marginTop: 56 }}>
             <h2
               style={{
-                fontFamily: "var(--fd)",
+                fontFamily: "var(--fb)",
                 fontSize: isMobile ? 24 : 30,
                 fontWeight: 400,
                 marginBottom: 6,

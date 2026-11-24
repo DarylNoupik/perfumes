@@ -30,7 +30,7 @@ export function AccountPage({ nav }) {
             {settings.shopName}
           </div>
           <h2
-            style={{ fontFamily: "var(--fd)", fontSize: 30, fontWeight: 400 }}
+            style={{ fontFamily: "var(--fb)", fontSize: 30, fontWeight: 400 }}
           >
             {mode === "login" ? "Bienvenue" : "Créer un compte"}
           </h2>
@@ -149,7 +149,7 @@ export function AccountPage({ nav }) {
             Mon Espace
           </div>
           <h2
-            style={{ fontFamily: "var(--fd)", fontSize: 34, fontWeight: 400 }}
+            style={{ fontFamily: "var(--fb)", fontSize: 34, fontWeight: 400 }}
           >
             Bonjour, {session.name.split(" ")[0]}
           </h2>
@@ -232,7 +232,7 @@ export function AccountPage({ nav }) {
               </div>
               <div
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   fontSize: 22,
                   marginBottom: 2,
                 }}
@@ -244,7 +244,7 @@ export function AccountPage({ nav }) {
           ))}
         </div>
       )}
-      <h3 style={{ fontFamily: "var(--fd)", fontSize: 22, marginBottom: 16 }}>
+      <h3 style={{ fontFamily: "var(--fb)", fontSize: 22, marginBottom: 16 }}>
         Mes Commandes
       </h3>
       {myOrders.length === 0 ? (
@@ -276,7 +276,7 @@ export function AccountPage({ nav }) {
                 <div>
                   <div
                     style={{
-                      fontFamily: "var(--fd)",
+                      fontFamily: "var(--fb)",
                       fontSize: 16,
                       marginBottom: 4,
                     }}
@@ -321,7 +321,7 @@ export function AccountPage({ nav }) {
                   {sbadge(o.status)}
                   <div
                     style={{
-                      fontFamily: "var(--fd)",
+                      fontFamily: "var(--fb)",
                       fontSize: 17,
                       color: "var(--gold)",
                     }}

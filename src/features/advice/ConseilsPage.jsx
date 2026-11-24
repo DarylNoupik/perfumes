@@ -51,7 +51,7 @@ export function ConseilsPage({ onView }) {
         </div>
         <h1
           style={{
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: isMobile
               ? "clamp(32px,8vw,52px)"
               : "clamp(42px,5vw,66px)",
@@ -94,7 +94,7 @@ export function ConseilsPage({ onView }) {
             <div key={s.l} style={{ textAlign: "center" }}>
               <div
                 style={{
-                  fontFamily: "var(--fd)",
+                  fontFamily: "var(--fb)",
                   fontSize: isMobile ? 28 : 36,
                   color: "var(--gold-l)",
                   fontWeight: 500,
@@ -197,7 +197,7 @@ export function ConseilsPage({ onView }) {
       >
         <h2
           style={{
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: isMobile ? 24 : 32,
             fontWeight: 400,
             marginBottom: 12,
@@ -325,7 +325,7 @@ function ConseilCard({ c, product, onView, onAdd }) {
         <h2
           onClick={open}
           style={{
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: 24,
             fontWeight: 400,
             lineHeight: 1.15,
@@ -337,7 +337,7 @@ function ConseilCard({ c, product, onView, onAdd }) {
         </h2>
         <p
           style={{
-            fontFamily: "var(--fd)",
+            fontFamily: "var(--fb)",
             fontSize: 16,
             fontStyle: "italic",
             color: "var(--gold-text)",
@@ -439,7 +439,7 @@ function ConseilCard({ c, product, onView, onAdd }) {
           <div>
             <div
               style={{
-                fontFamily: "var(--fd)",
+                fontFamily: "var(--fb)",
                 fontSize: 24,
                 color: "var(--gold-text)",
                 fontWeight: 500,

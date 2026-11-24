@@ -140,7 +140,7 @@ export function ProductPage({ product: p, onBack }) {
           <div
             style={{
               fontSize: 12,
-              letterSpacing: "0.22em",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               color: "var(--gold-text)",
               marginBottom: 8,
@@ -150,10 +150,10 @@ export function ProductPage({ product: p, onBack }) {
           </div>
           <h1
             style={{
-              fontFamily: "var(--fd)",
-              fontSize: 38,
-              fontWeight: 400,
-              lineHeight: 1.08,
+              fontFamily: "var(--fb)",
+              fontSize: "clamp(26px, 4vw, 36px)",
+              fontWeight: 600,
+              lineHeight: 1.15,
               marginBottom: 14,
             }}
           >
@@ -232,9 +232,11 @@ export function ProductPage({ product: p, onBack }) {
           </div>
           <div
             style={{
-              fontFamily: "var(--fd)",
-              fontSize: 34,
-              color: "var(--gold)",
+              fontFamily: "var(--fb)",
+              fontSize: 26,
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+              color: "var(--text)",
               marginBottom: 20,
             }}
           >

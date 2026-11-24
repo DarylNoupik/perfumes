@@ -106,7 +106,7 @@ export function TabProducts({ openInventory }) {
           gap: 10,
         }}
       >
-        <h2 style={{ fontFamily: "var(--fd)", fontSize: 30, fontWeight: 400 }}>
+        <h2 style={{ fontFamily: "var(--fb)", fontSize: 30, fontWeight: 400 }}>
           Produits
         </h2>
         {openInventory && <Btn v="ghost" sz="sm" onClick={() => openInventory("Stock")}>Voir le suivi du stock</Btn>}
@@ -125,7 +125,7 @@ export function TabProducts({ openInventory }) {
         >
           <h3
             style={{
-              fontFamily: "var(--fd)",
+              fontFamily: "var(--fb)",
               fontSize: 20,
               marginBottom: 18,
               fontWeight: 400,
@@ -481,7 +481,7 @@ export function TabProducts({ openInventory }) {
                       ) : (
                         <span
                           style={{
-                            fontFamily: "var(--fd)",
+                            fontFamily: "var(--fb)",
                             color: "var(--gold)",
                             fontSize: 14,
                           }}
